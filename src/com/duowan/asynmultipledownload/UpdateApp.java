@@ -9,6 +9,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
+import com.duowan.util.ToastShowUtil;
 import com.kugou.download.DefaultProgressListener;
 import com.kugou.download.DownloadFile;
 import com.kugou.download.FileDownloader;
@@ -41,7 +42,9 @@ public class UpdateApp {
 
 	private final int ERROR_DOWNLOAD = 0x10002;
 
-	private final int UPDATE_DOWNLOAD_PROGRESS = 0x10003;
+	private final int INTERUPT_DOWNLOAD = 0x10003;
+
+	private final int UPDATE_DOWNLOAD_PROGRESS = 0x10004;
 
 	private MyHandle mHandle = null;
 
@@ -58,7 +61,7 @@ public class UpdateApp {
 		if (mInstance == null) {
 			synchronized (UpdateApp.class) {
 				if (mInstance == null) {
-					Context context = BaseApplication.getInstance()
+					Context context = AsynMultipleApplication.getInstance()
 							.getApplicationContext();
 					mInstance = new UpdateApp(context);
 				}
@@ -103,6 +106,8 @@ public class UpdateApp {
 				sendEmptyHandle(COMPLETE_DOWNLOAD);
 				return;
 			} else if (state == FileDownloader.INTERUPT) {
+				mState = CANCEL_DOWNLOAD;
+				sendEmptyHandle(INTERUPT_DOWNLOAD);
 				return;
 			}
 
@@ -134,9 +139,22 @@ public class UpdateApp {
 			case COMPLETE_DOWNLOAD:
 				// 完成下载
 				Uri uri = Uri.fromFile(new File(mFilePath));
+				ToastShowUtil.showMsgShort(mContext, "COMPLETE_DOWNLOAD");
 				break;
 			case ERROR_DOWNLOAD:
 				// 下载失败
+				ToastShowUtil.showMsgShort(mContext, "ERROR_DOWNLOAD");
+				break;
+			case INTERUPT_DOWNLOAD:
+				// 中断下载
+				ToastShowUtil.showMsgShort(mContext, "INTERUPT_DOWNLOAD");
+				break;
+			case UPDATE_DOWNLOAD_PROGRESS:
+				// 更新进度
+				if (msg != null && msg.arg1 >= 0) {
+					ToastShowUtil.showMsgShort(mContext,
+							"UPDATE_DOWNLOAD_PROGRESS = " + msg.arg1);
+				}
 				break;
 			default:
 				break;

@@ -9,10 +9,10 @@ import android.net.Uri;
 import android.text.TextUtils;
 public class DuowanProvider extends BaseContentProvider {
 
-	public static final String AUTHORITY = "duowandb";
-
-	public static final String CONTENT_AUTHORITY_SLASH = "content://"
-			+ AUTHORITY + "/";
+//	public static final String AUTHORITY = "duowandb";
+//
+//	public static final String CONTENT_AUTHORITY_SLASH = "content://"
+//			+ AUTHORITY + "/";
 
 	private static final UriMatcher sUriMatcher;
 

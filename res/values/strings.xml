@@ -4,6 +4,6 @@
     <string name="app_name">AsynMultipleDownLoad</string>
     <string name="action_settings">Settings</string>
     <string name="down_load_start">开始下载</string>
-    <string name="down_load_stop">停止下载"></string>
+    <string name="down_load_stop">停止下载</string>
 
 </resources>

@@ -76,9 +76,9 @@ public class DownloadTable implements AppBaseColumns {
 	public static final Uri CONTENT_URI = Uri
 			.parse(BaseContentProvider.CONTENT_AUTHORITY_SLASH + "downloads");
 
-	public static final String CONTENT_TYPE = "vnd.android.cursor.dir/xiaozhandb.download";
+	public static final String CONTENT_TYPE = "vnd.android.cursor.dir/duowandb.download";
 
-	public static final String ENTRY_CONTENT_TYPE = "vnd.android.cursor.item/xiaozhandb.download";
+	public static final String ENTRY_CONTENT_TYPE = "vnd.android.cursor.item/duowandb.download";
 
 	/**
 	 * Ä¬ÈÏµÄÅÅÐò×Ö¶Î

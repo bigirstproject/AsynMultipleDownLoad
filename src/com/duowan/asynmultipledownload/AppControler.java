@@ -10,13 +10,13 @@ import com.duowan.asynmultipledownload.DownloadServiceUtil.DownloadServiceToken;
  */
 public final class AppControler {
 
-	private static BaseApplication mApplication;
+	private static AsynMultipleApplication mApplication;
 
 	private static AppControler mAppControler;
 
 	private DownloadServiceToken mDownloadServiceToken;
 
-	private AppControler(BaseApplication application) {
+	private AppControler(AsynMultipleApplication application) {
 		mApplication = application;
 	}
 
@@ -24,7 +24,7 @@ public final class AppControler {
 		if (mAppControler == null) {
 			synchronized (AppControler.class) {
 				if (mAppControler == null) {
-					BaseApplication baseApp = (BaseApplication) BaseApplication
+					AsynMultipleApplication baseApp = (AsynMultipleApplication) AsynMultipleApplication
 							.getInstance();
 					mAppControler = new AppControler(baseApp);
 				}
@@ -38,7 +38,7 @@ public final class AppControler {
 	 */
 	public void init() {
 		mDownloadServiceToken = DownloadServiceUtil
-				.bindToService(BaseApplication.getInstance());
+				.bindToService(AsynMultipleApplication.getInstance());
 	}
 
 	/**

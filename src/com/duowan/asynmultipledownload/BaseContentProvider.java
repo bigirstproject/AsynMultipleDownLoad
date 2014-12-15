@@ -13,7 +13,7 @@ import android.database.sqlite.SQLiteOpenHelper;
  */
 public abstract class BaseContentProvider extends ContentProvider {
 
-    public static String AUTHORITY = "library";
+    public static String AUTHORITY = "duowandb";
 
     public static String CONTENT_AUTHORITY_SLASH = "content://" + AUTHORITY + "/";
 
