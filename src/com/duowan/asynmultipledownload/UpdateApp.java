@@ -23,7 +23,7 @@ public class UpdateApp {
 	public static final String url = "http://113.108.88.66/dd.myapp.com/16891/4C54F9B4ED6F0C3F72A4E155A59D5CA3.apk";
 
 	public static final String mFilePath = Environment
-			.getExternalStorageDirectory().toString()
+			.getExternalStorageDirectory().toString()+"/"
 			+ url.substring(url.lastIndexOf("/") + 1, url.length());
 
 	private Context mContext = null;

@@ -41,6 +41,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		case R.id.down_load_stop:
 			ToastShowUtil.showMsgShort(this,
 					getResources().getString(R.string.down_load_stop));
+			instance.cancelDownload();
 			break;
 		default:
 			break;
