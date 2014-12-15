@@ -12,77 +12,75 @@ class NormalDownloadTask extends AbstractDownloadTask {
 		Logger.debug("task", "∆’Õ®œ¬‘ÿ");
 	}
 
-	public void run() {
-		String resUrl = this.downloadFile.getResUrl();
-		if (Logger.isDebug()) {
-			Logger.debug("task", "resUrl=" + resUrl);
-		}
-		;
-		while (!(this.stop))
-			try {
-				KGHttpResponse httpResponse = this.httpConnector
-						.getHttpResponse(resUrl);
-				if (httpResponse != null) {
-					int responseCode = httpResponse.getResponseCode();
-					if ((responseCode == 200) || (responseCode == 206)) {
-						long contentLength = -1L;
-						if (httpResponse.containsHeader("content_length")) {
-							contentLength = ((Long) httpResponse
-									.getHeader("content_length")).longValue();
-						}
+	public void run()
+  {
+    String resUrl = this.downloadFile.getResUrl();
+    if (Logger.isDebug()) {
+      Logger.debug("task", "resUrl=" + resUrl);
+    }
+    label310: while (!(this.stop))
+      try {
+        KGHttpResponse httpResponse = this.httpConnector.getHttpResponse(resUrl);
+        if (httpResponse != null) {
+          int responseCode = httpResponse.getResponseCode();
+          if ((responseCode == 200) || (responseCode == 206)) {
+            long contentLength = -1L;
+            if (httpResponse.containsHeader("content_length")) {
+              contentLength = ((Long)httpResponse
+                .getHeader("content_length")).longValue();
+            }
 
-						Logger.debug("task", "contentLength=" + contentLength);
-						InputStream input = httpResponse.getInputStream();
-						long saveLength = this.fileAccess.saveFile(input,
-								this.mListener);
-						if (contentLength != -1L) {
-							if (saveLength == contentLength) {
-								finish();
-								return;
-							}
+            Logger.debug("task", "contentLength=" + contentLength);
+            InputStream input = httpResponse.getInputStream();
+            long saveLength = this.fileAccess.saveFile(input, this.mListener);
+            if (contentLength != -1L) {
+              if (saveLength == contentLength) {
+                finish();
+                return;
+              }
 
-							this.downloadFile.resetHaveRead();
-							addFaileCounter();
-							break;
-						}
-						if (saveLength != -1L) {
-							finish();
-							break;
-						}
-						this.downloadFile.resetHaveRead();
-						addFaileCounter();
+              this.downloadFile.resetHaveRead();
+              addFaileCounter();
 
-						break;
-					}
-					this.downloadFile.resetHaveRead();
-					addFaileCounter();
-					break;
-				}
-				this.downloadFile.resetHaveRead();
-				boolean isNetworkAvalid = ConfigWrapper.getInstance()
-						.isNetworkAvalid();
-				if (!(isNetworkAvalid)) {
-					stopByNetError();
-					break;
-				}
-				addFaileCounter();
-			} catch (Exception e) {
-				this.downloadFile.resetHaveRead();
+              break label310; }
+            if (saveLength != -1L) {
+              finish();
+              break label310;
+            }
+            this.downloadFile.resetHaveRead();
+            addFaileCounter();
 
-				if (e instanceof FileNotFoundException) {
-					stopByFileNotFound();
-				} else {
-					boolean isNetworkAvalid = ConfigWrapper.getInstance()
-							.isNetworkAvalid();
-					if (!(isNetworkAvalid)) {
-						stopByNetError();
-					} else {
-						this.httpConnector = createHttpConnector(true);
-						addFaileCounter();
-					}
-				}
-			}
-	}
+            break label310;
+          }
+          this.downloadFile.resetHaveRead();
+          addFaileCounter();
+
+          break label310;
+        }
+        this.downloadFile.resetHaveRead();
+        boolean isNetworkAvalid = ConfigWrapper.getInstance().isNetworkAvalid();
+        if (!(isNetworkAvalid)) {
+          stopByNetError();
+          break label310; }
+        addFaileCounter();
+      }
+      catch (Exception e)
+      {
+        this.downloadFile.resetHaveRead();
+
+        if (e instanceof FileNotFoundException) {
+          stopByFileNotFound();
+        } else {
+          boolean isNetworkAvalid = ConfigWrapper.getInstance().isNetworkAvalid();
+          if (!(isNetworkAvalid)) {
+            stopByNetError();
+          } else {
+            this.httpConnector = createHttpConnector(true);
+            addFaileCounter();
+          }
+        }
+      }
+  }
 
 	private void finish() {
 		stopDownload();

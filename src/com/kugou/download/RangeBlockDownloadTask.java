@@ -1,4 +1,3 @@
-/*** Eclipse Class Decompiler plugin, copyright (c) 2012 Chao Chen (cnfree2000@hotmail.com) ***/
 package com.kugou.download;
 
 import java.io.BufferedInputStream;
@@ -35,7 +34,7 @@ class RangeBlockDownloadTask extends AbstractDownloadTask {
 			Logger.debug(this.tag,
 					getMessage("开始下载" + this.blockedDownloadFile.getFileName()));
 		}
-		while (!(this.stop)) {
+		label721: label988: while (!(this.stop)) {
 			int freeBlockIndex = FreeBlockManager
 					.getFreeBlockIndex(this.blockedDownloadFile);
 			int bufferedIndex = this.blockedDownloadFile.getBufferedIndex();
@@ -66,14 +65,14 @@ class RangeBlockDownloadTask extends AbstractDownloadTask {
 					.getBufferBlockNum();
 			bufferBlockNum = Math.max(bufferBlockNum, ConfigWrapper
 					.getInstance().getTaskNum());
+	
 			if ((bufferBlockNum != -1)
 					&& (freeBlockIndex - (bufferedIndex + 1) >= bufferBlockNum)) {
 				dataBlock.setState(0);
-
-				label721: label988: try {
-					sleep(500L);
-				} catch (Exception localException1) {
-				}
+				 try {
+						sleep(500L);
+					} catch (Exception localException1) {
+					}
 			} else {
 				long start = dataBlock.getStart();
 				long end = dataBlock.getEnd();
@@ -110,10 +109,9 @@ class RangeBlockDownloadTask extends AbstractDownloadTask {
 										getMessage("content-length="
 												+ contentLength));
 								if (contentLength == reqLength)
-									break label721;
+									faile(dataBlock, 1);
 								this.downloader.setTryNumMax();
-								faile(dataBlock, 1);
-								break label995;
+								break label721;
 							}
 							if (httpResponse.containsHeader("content_type")) {
 								String contentType = (String) httpResponse
@@ -125,7 +123,7 @@ class RangeBlockDownloadTask extends AbstractDownloadTask {
 								if ("image/jpeg".equalsIgnoreCase(contentType)) {
 									this.downloader.setTryNumMax();
 									faile(dataBlock, 1);
-									break label995;
+									break label721;
 								}
 							}
 
@@ -176,8 +174,8 @@ class RangeBlockDownloadTask extends AbstractDownloadTask {
 				}
 			}
 		}
-		if (Logger.isDebug())
-			label995: Logger.debug(this.tag, getMessage("------线程结束--------"));
+//		if (Logger.isDebug())
+//			label995: Logger.debug(this.tag, getMessage("------线程结束--------"));
 	}
 
 	private byte[] readData(InputStream input, long reqLength) throws Exception {

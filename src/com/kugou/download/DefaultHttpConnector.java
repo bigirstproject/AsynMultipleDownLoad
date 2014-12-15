@@ -5,7 +5,6 @@ import java.io.InputStream;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
-import java.net.Proxy.Type;
 import java.net.URL;
 import java.util.Hashtable;
 
@@ -57,31 +56,33 @@ class DefaultHttpConnector implements IHttpConnector {
 	}
 
 	private HttpURLConnection create(String resUrl) throws Exception {
-    URL url = new URL(resUrl);
-    HttpURLConnection httpConn;
-    if (this.isCmwap)
-    {
-      Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress("10.0.0.172", 80));
-      httpConn = (HttpURLConnection)url.openConnection(proxy);
-    } else {
-      httpConn = (HttpURLConnection)url.openConnection();
-    }
-    if (ConfigWrapper.getInstance().getNetType() == NetType.WIFI) {
-      httpConn.setConnectTimeout(10000);
-      httpConn.setReadTimeout(10000);
-    } else {
-      httpConn.setConnectTimeout(16000);
-      httpConn.setReadTimeout(16000);
-    }
-    httpConn.setRequestProperty("Connection", "Keep-Alive");
-    Hashtable<String, String> requestHeaders = ConfigWrapper.getInstance().getRequestHeaders();
-    if (requestHeaders != null) {
-      for (String key : requestHeaders.keySet()) {
-        httpConn.setRequestProperty(key, (String)requestHeaders.get(key));
-      }
-    }
-    return httpConn;
-  }
+		URL url = new URL(resUrl);
+		HttpURLConnection httpConn;
+		if (this.isCmwap) {
+			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
+					"10.0.0.172", 80));
+			httpConn = (HttpURLConnection) url.openConnection(proxy);
+		} else {
+			httpConn = (HttpURLConnection) url.openConnection();
+		}
+		if (ConfigWrapper.getInstance().getNetType() == NetType.WIFI) {
+			httpConn.setConnectTimeout(10000);
+			httpConn.setReadTimeout(10000);
+		} else {
+			httpConn.setConnectTimeout(16000);
+			httpConn.setReadTimeout(16000);
+		}
+		httpConn.setRequestProperty("Connection", "Keep-Alive");
+		Hashtable<String, String> requestHeaders = ConfigWrapper.getInstance()
+				.getRequestHeaders();
+		if (requestHeaders != null) {
+			for (String key : requestHeaders.keySet()) {
+				httpConn.setRequestProperty(key,
+						(String) requestHeaders.get(key));
+			}
+		}
+		return httpConn;
+	}
 
 	private KGHttpResponse handleResponse(HttpURLConnection httpConn)
 			throws Exception {
