@@ -3,6 +3,7 @@ package com.duowan.asynmultipledownload;
 import android.content.Intent;
 
 import com.duowan.asynmultipledownload.DownloadServiceUtil.DownloadServiceToken;
+import com.duowan.asynmultipledownload.ui.AsynMultipleApplication;
 
 /**
  * 描述:应用启动/退出逻辑处理类

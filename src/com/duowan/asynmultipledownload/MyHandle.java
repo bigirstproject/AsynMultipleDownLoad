@@ -9,10 +9,6 @@ import com.duowan.util.ToastShowUtil;
 
 public class MyHandle extends Handler {
 	private Context mContext;
-	private TextView mTxtOne;
-	private TextView mTxtTwo;
-	private TextView mTxtThree;
-	
 	private final int UN_CHECKED = 1;
 
 	private final int DOWNLOADING = 4;
@@ -31,11 +27,8 @@ public class MyHandle extends Handler {
 
 	private final int UPDATE_DOWNLOAD_PROGRESS = 0x10004;
 	
-	public MyHandle(Context context,TextView mTxtOne,TextView mTxtTwo,TextView mTxtThree) {
+	public MyHandle(Context context) {
 		this.mContext = context;
-		this.mTxtOne = mTxtOne;
-		this.mTxtTwo = mTxtTwo;
-		this.mTxtThree = mTxtThree;
 	}
 
 	

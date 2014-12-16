@@ -69,6 +69,10 @@ public class DownloadManager {
 		synchronized (this.mDownloadingSet) {
 			if (!(this.mDownloadingSet.containsKey(key))) {
 				this.mDownloadingSet.put(key, downloader);
+			}else{
+				//如果在下载中，就不再下载
+				callback.onProgressChanged(downloader.getDownloadFile(), 0);
+				return false;
 			}
 		}
 		DownloadProgressListener listener = new DownloadProgressListener(this);

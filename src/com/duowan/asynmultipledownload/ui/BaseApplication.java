@@ -1,4 +1,4 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.ui;
 
 import java.util.HashMap;
 import java.util.Hashtable;
