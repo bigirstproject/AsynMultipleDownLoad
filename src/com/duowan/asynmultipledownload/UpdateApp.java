@@ -9,10 +9,10 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
+import com.duowan.download.DefaultProgressListener;
+import com.duowan.download.DownloadFile;
+import com.duowan.download.FileDownloader;
 import com.duowan.util.ToastShowUtil;
-import com.kugou.download.DefaultProgressListener;
-import com.kugou.download.DownloadFile;
-import com.kugou.download.FileDownloader;
 
 /**
  * √Ë ˆ: …˝º∂π‹¿Ì

@@ -12,8 +12,9 @@ public class DownLoadUrlUtil {
 	public static final String URL_TWO = "http://a.myapp.com/o/down/com.yy.android.gamenews";
 	
 	public static final String URL_THREE = "http://dl.wandoujia.com/files/third/WanDouJiaSetup_a9.exe";
-
-
+	
+	public static final String URL_FOUR = "http://dlsw.baidu.com/sw-search-sp/gaosu/2014_12_02_21/bind1/12350/QQ6.6.13172.0_12350_BDdl.exe";
+	
 	public static final String FILE_PATH_ONE = BASE_PATH+"/"
 			+ URL_ONE.substring(URL_ONE.lastIndexOf("/") + 1, URL_ONE.length());
 	

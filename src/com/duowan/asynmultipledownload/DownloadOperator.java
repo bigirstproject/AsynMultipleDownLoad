@@ -9,7 +9,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
-import com.kugou.download.DownloadFile;
+import com.duowan.download.DownloadFile;
 
 /**
  * 下载表操作类

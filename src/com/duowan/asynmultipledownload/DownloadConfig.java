@@ -5,8 +5,8 @@ import java.util.Hashtable;
 import android.content.Context;
 
 import com.duowan.asynmultipledownload.NetWorkUtil.NetworkType;
-import com.kugou.download.DefaultConfig;
-import com.kugou.download.NetType;
+import com.duowan.download.DefaultConfig;
+import com.duowan.download.NetType;
 
 /**
  * обтьеДжц

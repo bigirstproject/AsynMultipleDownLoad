@@ -1,8 +1,8 @@
 package com.duowan.asynmultipledownload;
 
-import com.kugou.download.DownloadFile;
-import com.kugou.download.IProgressListener;
-import com.kugou.download.manager.ParamsWrapper;
+import com.duowan.download.DownloadFile;
+import com.duowan.download.IProgressListener;
+import com.duowan.download.manager.ParamsWrapper;
 
 /**
  * 后台服务接口

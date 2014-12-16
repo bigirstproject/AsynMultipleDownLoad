@@ -4,12 +4,12 @@ import android.content.Intent;
 import android.os.Binder;
 import android.os.IBinder;
 
-import com.kugou.download.DownloadFile;
-import com.kugou.download.IConfig;
-import com.kugou.download.IOperator;
-import com.kugou.download.IProgressListener;
-import com.kugou.download.manager.DownloadManager;
-import com.kugou.download.manager.ParamsWrapper;
+import com.duowan.download.DownloadFile;
+import com.duowan.download.IConfig;
+import com.duowan.download.IOperator;
+import com.duowan.download.IProgressListener;
+import com.duowan.download.manager.DownloadManager;
+import com.duowan.download.manager.ParamsWrapper;
 
 /**
  * ÏÂÔØ·þÎñ

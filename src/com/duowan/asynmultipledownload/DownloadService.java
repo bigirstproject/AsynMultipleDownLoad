@@ -1,8 +1,8 @@
 
 package com.duowan.asynmultipledownload;
 
-import com.kugou.download.IConfig;
-import com.kugou.download.IOperator;
+import com.duowan.download.IConfig;
+import com.duowan.download.IOperator;
 
 public class DownloadService extends BaseDownloadService {
 

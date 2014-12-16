@@ -3,8 +3,8 @@ package com.duowan.asynmultipledownload;
 
 import java.util.List;
 
-import com.kugou.download.DefaultOperator;
-import com.kugou.download.DownloadFile;
+import com.duowan.download.DefaultOperator;
+import com.duowan.download.DownloadFile;
 
 /**
  * 下载信息保存类
