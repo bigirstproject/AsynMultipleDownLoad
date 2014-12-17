@@ -15,8 +15,6 @@ public class AppDownloadProListener extends DefaultProgressListener {
 	private long fileSize = 1;
 
 	private Context mContext = null;
-	
-	
 
 	private final int UN_CHECKED = 1;
 
@@ -54,34 +52,43 @@ public class AppDownloadProListener extends DefaultProgressListener {
 			msg.obj = file.getResUrl();
 			msg.what = COMPLETE_DOWNLOAD;
 			sendMessage(msg);
-			return;
 		} else if (state == FileDownloader.INTERUPT) {
+			
 			mState = CANCEL_DOWNLOAD;
-			sendEmptyHandle(INTERUPT_DOWNLOAD);
-			return;
+			haveRead = file.getHaveRead();
+			fileSize = file.getFileSize();
+			int downloadPer = (int) ((haveRead * 100) / fileSize);
+			Message msg = new Message();
+			msg.arg1 = downloadPer;
+			msg.obj = file.getResUrl();
+			msg.what = INTERUPT_DOWNLOAD;
+			sendMessage(msg);
+		}else if (state == FileDownloader.DOWNLOADING) {
+			mState = DOWNLOADING;
+			haveRead = file.getHaveRead();
+			fileSize = file.getFileSize();
+			int downloadPer = (int) ((haveRead * 100) / fileSize);
+			Message msg = new Message();
+			msg.arg1 = downloadPer;
+			msg.obj = file.getResUrl();
+			msg.what = UPDATE_DOWNLOAD_PROGRESS;
+			sendMessage(msg);
 		}
-
-
-		haveRead = file.getHaveRead();
-		fileSize = file.getFileSize();
-		int downloadPer = (int) ((haveRead * 100) / fileSize);
-		Message msg = new Message();
-		msg.arg1 = downloadPer;
-		msg.obj = file.getResUrl();
-		msg.what = UPDATE_DOWNLOAD_PROGRESS;
-		sendMessage(msg);
+		
 	}
 
 	@Override
 	public void onError(DownloadFile file, int errorType) {
 		super.onError(file, errorType);
 		mState = ERROR;
-		sendEmptyHandle(ERROR_DOWNLOAD);
-
-	}
-
-	private void sendEmptyHandle(int what) {
-		mHandle.sendEmptyMessage(what);
+		haveRead = file.getHaveRead();
+		fileSize = file.getFileSize();
+		int downloadPer = (int) ((haveRead * 100) / fileSize);
+		Message msg = new Message();
+		msg.arg1 = downloadPer;
+		msg.obj = file.getResUrl();
+		msg.what = ERROR_DOWNLOAD;
+		sendMessage(msg);
 	}
 
 	private void sendMessage(Message msg) {

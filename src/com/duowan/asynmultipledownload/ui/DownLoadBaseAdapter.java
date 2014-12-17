@@ -69,7 +69,6 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 			convertView = mInflater.inflate(R.layout.listview_item, null);
 			viewHolder = new ViewHolder();
 			viewHolder.start = (Button) convertView.findViewById(R.id.start);
-			viewHolder.stop = (Button) convertView.findViewById(R.id.stop);
 			viewHolder.progress = (TextView) convertView
 					.findViewById(R.id.progress);
 			convertView.setTag(viewHolder);
@@ -77,20 +76,33 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 			viewHolder = (ViewHolder) convertView.getTag();
 		}
 		DownLoadParcel item = (DownLoadParcel) getItem(position);
-		if (item != null && item.getProgress() > 0) {
-			viewHolder.progress.setText(item.getProgress() + "%");
-			// viewHolder.progress.setText(String.format(mContext.getResources().getString(
-			// R.string.down_load_progress),item.getProgress()));
-			if(item.isDownStatus()){
-				viewHolder.start.setText(mContext.getResources().getString(R.string.down_load_stop));
-			}else{
-				viewHolder.start.setText(mContext.getResources().getString(R.string.down_load_start));
-			}
-		} else {
-			viewHolder.progress.setText("0%");
-		}
 		viewHolder.start.setOnClickListener(new onItemClick(position, item));
-		
+		if (item != null) {
+			if (item.getDownStatus() == DownLoadParcel.START) {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_start));
+			} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_downing));
+			} else if (item.getDownStatus() == DownLoadParcel.CONTINUE) {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_continue));
+			} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_complete));
+				viewHolder.start.setOnClickListener(null);
+			} else {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_start));
+				viewHolder.start.setOnClickListener(null);
+			}
+			if (item.getProgress() > 0) {
+				viewHolder.progress.setText(item.getProgress() + "%");
+			} else {
+				viewHolder.progress.setText("0%");
+			}
+		}
+
 		return convertView;
 	}
 
@@ -109,31 +121,29 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 			case R.id.start:
 				if (item != null && !TextUtils.isEmpty(item.getUrl())
 						&& !TextUtils.isEmpty(item.getFilePath())) {
-					if (!item.isDownStatus()) {
-						ToastShowUtil.showMsgShort(
-								mContext,
-								mContext.getResources().getString(
-										R.string.down_load_start));
-						item.setDownStatus(true);
-						notifyDataInvalidated();
+					if (item.getDownStatus() == DownLoadParcel.START) {
+						item.setDownStatus(DownLoadParcel.DOWNING);
 						DownloadServiceUtil.download(item.getUrl(), item
 								.getFilePath(), new AppDownloadProListener(
 								new MyHandle(mContext)));
-					} else {
-						ToastShowUtil.showMsgShort(mContext, mContext.getResources()
-								.getString(R.string.down_load_stop));
-						item.setDownStatus(false);
-						notifyDataInvalidated();
+					} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
+						item.setDownStatus(DownLoadParcel.CONTINUE);
 						DownloadServiceUtil.stopDownload(item.getUrl());
+					} else if (item.getDownStatus() == DownLoadParcel.CONTINUE) {
+						item.setDownStatus(DownLoadParcel.DOWNING);
+						DownloadServiceUtil.download(item.getUrl(), item
+								.getFilePath(), new AppDownloadProListener(
+								new MyHandle(mContext)));
+					} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
+						ToastShowUtil.showMsgShort(
+								mContext,
+								mContext.getResources().getString(
+										R.string.down_load_complete_title));
 					}
+					notifyDataInvalidated();
 				} else {
 					ToastShowUtil.showMsgShort(mContext, "item = null");
 				}
-				break;
-			case R.id.stop:
-				ToastShowUtil.showMsgShort(mContext, mContext.getResources()
-						.getString(R.string.down_load_stop));
-				DownloadServiceUtil.stopDownload(item.getUrl());
 				break;
 			default:
 				break;
@@ -182,6 +192,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(100);
+							downLoadParcel.setDownStatus(DownLoadParcel.COMPLETE);
 							notifyDataInvalidated();
 							break;
 						}
@@ -191,10 +202,36 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 			case ERROR_DOWNLOAD:
 				// 下载失败
 				ToastShowUtil.showMsgShort(mContext, "ERROR_DOWNLOAD");
+				if (msg != null && msg.arg1 >= 0 && msg.obj instanceof String) {
+					String resUrl = (String) msg.obj;
+					Log.d("test", resUrl + " = " + msg.arg1);
+					for (int i = 0; i < mList.size(); i++) {
+						DownLoadParcel downLoadParcel = mList.get(i);
+						if (resUrl.equals(downLoadParcel.getUrl())) {
+							downLoadParcel.setProgress(msg.arg1);
+							downLoadParcel.setDownStatus(DownLoadParcel.CONTINUE);
+							notifyDataInvalidated();
+							break;
+						}
+					}
+				}
 				break;
 			case INTERUPT_DOWNLOAD:
 				// 中断下载
 				ToastShowUtil.showMsgShort(mContext, "INTERUPT_DOWNLOAD");
+				if (msg != null && msg.arg1 >= 0 && msg.obj instanceof String) {
+					String resUrl = (String) msg.obj;
+					Log.d("test", resUrl + " = " + msg.arg1);
+					for (int i = 0; i < mList.size(); i++) {
+						DownLoadParcel downLoadParcel = mList.get(i);
+						if (resUrl.equals(downLoadParcel.getUrl())) {
+							downLoadParcel.setProgress(msg.arg1);
+							downLoadParcel.setDownStatus(DownLoadParcel.CONTINUE);
+							notifyDataInvalidated();
+							break;
+						}
+					}
+				}
 				break;
 			case UPDATE_DOWNLOAD_PROGRESS:
 				// 更新进度
@@ -205,6 +242,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(msg.arg1);
+							downLoadParcel.setDownStatus(DownLoadParcel.DOWNING);
 							notifyDataInvalidated();
 							break;
 						}
@@ -219,7 +257,6 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 
 	static class ViewHolder {
 		Button start;
-		Button stop;
 		TextView progress;
 	}
 

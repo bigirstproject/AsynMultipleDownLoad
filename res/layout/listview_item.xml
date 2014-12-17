@@ -10,14 +10,6 @@
         android:layout_height="wrap_content"
         android:text="@string/down_load_start" />
 
-    <Button
-        android:id="@+id/stop"
-        android:layout_width="wrap_content"
-        android:layout_marginLeft="8dip"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:text="@string/down_load_stop" />
-
     <TextView
         android:id="@+id/progress"
         android:layout_weight="1"
