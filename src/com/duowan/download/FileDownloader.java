@@ -7,10 +7,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileDownloader {
-	public static final int PREPAREING = 1; 
+	public static final int PREPAREING = 1;
 	public static final int READY = 2;
 	public static final int DOWNLOADING = 3;
-	public static final int INTERUPT = 4; 
+	public static final int INTERUPT = 4;
 	public static final int FINISH = 5;
 	public static final int CREATE_FILE_ERROR = 10;
 	public static final int GET_FILE_SIZE_ERROR = 11;
@@ -207,6 +207,7 @@ public class FileDownloader {
 		if ((isRange) && (isBlock)) {
 			taskNum = this.configWrapper.getTaskNum();
 		}
+		Logger.debug("test", "isRange = "+isRange +"     isBlock = "+isBlock + "   taskNum = "+taskNum);
 		startDownloadTasks(taskNum);
 	}
 
@@ -392,6 +393,9 @@ public class FileDownloader {
 				IHttpConnector httpConn = DefaultHttpConnectorFactory
 						.create(isCmwap);
 				contentLength = httpConn.getContentLength(resUrl);
+				if (contentLength > 0) {
+					break;
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}

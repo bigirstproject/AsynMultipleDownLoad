@@ -1,4 +1,3 @@
-/*** Eclipse Class Decompiler plugin, copyright (c) 2012 Chao Chen (cnfree2000@hotmail.com) ***/
 package com.duowan.download;
 
 import java.io.FileNotFoundException;
@@ -27,6 +26,7 @@ class RangeNotBlockDownloadTask extends AbstractDownloadTask {
 				else {
 					httpResponse = this.httpConnector.getHttpResponse(resUrl);
 				}
+				Logger.debug("task", "code = " + httpResponse.getResponseCode());
 				if (httpResponse != null) {
 					int responseCode = httpResponse.getResponseCode();
 					if ((responseCode == 200) || (responseCode == 206)) {
@@ -55,7 +55,7 @@ class RangeNotBlockDownloadTask extends AbstractDownloadTask {
 							addFaileCounter();
 							this.httpConnector.close();
 							this.httpConnector = createHttpConnector(true);
-							break label490;
+							// break label490;
 						}
 
 						InputStream input = httpResponse.getInputStream();
@@ -86,14 +86,9 @@ class RangeNotBlockDownloadTask extends AbstractDownloadTask {
 							this.downloader.addTryNum();
 							return;
 						}
-
-						addFaileCounter();
-
-						break label490;
 					}
 					addFaileCounter();
-
-					break label490;
+					// break label490;
 				}
 				boolean isNetworkAvalid = ConfigWrapper.getInstance()
 						.isNetworkAvalid();
@@ -101,10 +96,9 @@ class RangeNotBlockDownloadTask extends AbstractDownloadTask {
 					stopByNetError();
 					break label490;
 				}
-				addFaileCounter();
 			} catch (Exception e) {
 				e.printStackTrace();
-				if (e instanceof FileNotFoundException) {
+				if (e != null && e instanceof FileNotFoundException) {
 					stopByFileNotFound();
 				} else {
 					boolean isNetworkAvalid = ConfigWrapper.getInstance()

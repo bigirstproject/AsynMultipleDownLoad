@@ -6,7 +6,6 @@ public class Statistics {
 	private long receivedLen;
 	private long refreshTime;
 	private long downloadLen;
-	private boolean wholeFile;
 	private int currentSpeed;
 	private P2PStatistics p2p;
 

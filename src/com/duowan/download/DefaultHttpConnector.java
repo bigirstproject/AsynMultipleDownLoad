@@ -43,7 +43,7 @@ class DefaultHttpConnector implements IHttpConnector {
 		this.httpConn = create(resUrl);
 		int contentLength = -1;
 		int responseCode = this.httpConn.getResponseCode();
-		Logger.debug("responseCode", "responseCode-->" + responseCode);
+		Logger.debug("responseCode", "getContentLength responseCode-->" + responseCode);
 		if ((responseCode == 200) || (responseCode == 206)) {
 			contentLength = this.httpConn.getContentLength();
 			this.httpConn.disconnect();
@@ -66,11 +66,11 @@ class DefaultHttpConnector implements IHttpConnector {
 			httpConn = (HttpURLConnection) url.openConnection();
 		}
 		if (ConfigWrapper.getInstance().getNetType() == NetType.WIFI) {
-			httpConn.setConnectTimeout(10000);
-			httpConn.setReadTimeout(10000);
+			httpConn.setConnectTimeout(8000);
+			httpConn.setReadTimeout(8000);
 		} else {
-			httpConn.setConnectTimeout(16000);
-			httpConn.setReadTimeout(16000);
+			httpConn.setConnectTimeout(12000);
+			httpConn.setReadTimeout(12000);
 		}
 		httpConn.setRequestProperty("Connection", "Keep-Alive");
 		Hashtable<String, String> requestHeaders = ConfigWrapper.getInstance()
@@ -88,7 +88,7 @@ class DefaultHttpConnector implements IHttpConnector {
 			throws Exception {
 		if (httpConn != null) {
 			int responseCode = httpConn.getResponseCode();
-			Logger.debug("responseCode", "responseCode-->" + responseCode);
+			Logger.debug("responseCode", "handleResponse responseCode -->" + responseCode);
 			InputStream inputStream = httpConn.getInputStream();
 			long contentLength = httpConn.getContentLength();
 			String contentType = httpConn.getContentType();

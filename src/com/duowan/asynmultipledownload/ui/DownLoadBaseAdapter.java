@@ -26,15 +26,21 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 	private Context mContext;
 	private LayoutInflater mInflater;
 	private ArrayList<DownLoadParcel> mList;
+	private MyHandle myHandler;
 
 	public DownLoadBaseAdapter(Context context) {
 		this.mContext = context;
 		mInflater = LayoutInflater.from(context);
+		myHandler = new MyHandle(mContext);
 	}
 
 	public void setData(ArrayList<DownLoadParcel> list) {
 		this.mList = list;
 		notifyDataInvalidated();
+	}
+
+	public ArrayList<DownLoadParcel> getData() {
+		return mList;
 	}
 
 	public synchronized void notifyDataInvalidated() {
@@ -125,7 +131,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						item.setDownStatus(DownLoadParcel.DOWNING);
 						DownloadServiceUtil.download(item.getUrl(), item
 								.getFilePath(), new AppDownloadProListener(
-								new MyHandle(mContext)));
+								myHandler));
 					} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
 						item.setDownStatus(DownLoadParcel.CONTINUE);
 						DownloadServiceUtil.stopDownload(item.getUrl());
@@ -133,7 +139,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						item.setDownStatus(DownLoadParcel.DOWNING);
 						DownloadServiceUtil.download(item.getUrl(), item
 								.getFilePath(), new AppDownloadProListener(
-								new MyHandle(mContext)));
+								myHandler));
 					} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
 						ToastShowUtil.showMsgShort(
 								mContext,
@@ -192,7 +198,8 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(100);
-							downLoadParcel.setDownStatus(DownLoadParcel.COMPLETE);
+							downLoadParcel
+									.setDownStatus(DownLoadParcel.COMPLETE);
 							notifyDataInvalidated();
 							break;
 						}
@@ -209,7 +216,8 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(msg.arg1);
-							downLoadParcel.setDownStatus(DownLoadParcel.CONTINUE);
+							downLoadParcel
+									.setDownStatus(DownLoadParcel.CONTINUE);
 							notifyDataInvalidated();
 							break;
 						}
@@ -226,7 +234,8 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(msg.arg1);
-							downLoadParcel.setDownStatus(DownLoadParcel.CONTINUE);
+							downLoadParcel
+									.setDownStatus(DownLoadParcel.CONTINUE);
 							notifyDataInvalidated();
 							break;
 						}
@@ -242,7 +251,8 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(msg.arg1);
-							downLoadParcel.setDownStatus(DownLoadParcel.DOWNING);
+							downLoadParcel
+									.setDownStatus(DownLoadParcel.DOWNING);
 							notifyDataInvalidated();
 							break;
 						}

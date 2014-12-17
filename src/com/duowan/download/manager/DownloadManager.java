@@ -16,14 +16,16 @@ import com.duowan.download.Logger;
 public class DownloadManager {
 	public static final int NOTIFY_PROGRESS = 1;
 	public static final int NOTIFY_ERROR = 2;
-	private ExecutorService mExecutorService;
+	private ExecutorService mExecutorDownService;
+	private ExecutorService mExecutorStopService;
 	private HashMap<String, FileDownloader> mDownloadingSet;
 	private Queue<ParamsWrapper> mWaittingQueue;
 	private IOperator mOperator;
 	private IConfig mConfig;
 
 	public DownloadManager(IOperator operator, boolean isDebug) {
-		this.mExecutorService = Executors.newCachedThreadPool();
+		this.mExecutorDownService = Executors.newCachedThreadPool();
+		this.mExecutorStopService = Executors.newCachedThreadPool();
 		this.mDownloadingSet = new HashMap();
 		this.mWaittingQueue = new LinkedList();
 		this.mOperator = operator;
@@ -71,7 +73,7 @@ public class DownloadManager {
 				this.mDownloadingSet.put(key, downloader);
 			}else{
 				//如果在下载中，就不再下载
-				callback.onProgressChanged(downloader.getDownloadFile(), 0);
+				callback.onProgressChanged(downloader.getDownloadFile(), 1);
 				return false;
 			}
 		}
@@ -81,7 +83,7 @@ public class DownloadManager {
 		}
 		downloader.setProgressListener(listener);
 
-		this.mExecutorService.execute(new DownloadThread(downloader));
+		this.mExecutorDownService.execute(new DownloadThread(downloader));
 		return true;
 	}
 
@@ -100,7 +102,7 @@ public class DownloadManager {
 			FileDownloader downloader = (FileDownloader) this.mDownloadingSet
 					.remove(key);
 			if (downloader != null)
-				downloader.stop();
+				mExecutorStopService.execute(new StopDownThread(downloader));
 		}
 	}
 
@@ -222,6 +224,18 @@ public class DownloadManager {
 
 		public void run() {
 			this.mDownloader.startTask();
+		}
+	}
+	
+	private class StopDownThread implements Runnable {
+		private FileDownloader mStopDown;
+
+		StopDownThread(FileDownloader paramFileDownloader) {
+			this.mStopDown = paramFileDownloader;
+		}
+
+		public void run() {
+			this.mStopDown.stop();
 		}
 	}
 }
