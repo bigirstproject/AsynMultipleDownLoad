@@ -26,13 +26,12 @@ public class DownloadManager {
 	public DownloadManager(IOperator operator, boolean isDebug) {
 		this.mExecutorDownService = Executors.newCachedThreadPool();
 		this.mExecutorStopService = Executors.newCachedThreadPool();
-		this.mDownloadingSet = new HashMap();
-		this.mWaittingQueue = new LinkedList();
+		this.mDownloadingSet = new HashMap<String, FileDownloader>();
+		this.mWaittingQueue = new LinkedList<ParamsWrapper>();
 		this.mOperator = operator;
 		if (this.mOperator == null) {
 			throw new IllegalArgumentException("operator can not be null.");
 		}
-
 		Logger.setDebug(isDebug);
 	}
 
@@ -71,8 +70,8 @@ public class DownloadManager {
 		synchronized (this.mDownloadingSet) {
 			if (!(this.mDownloadingSet.containsKey(key))) {
 				this.mDownloadingSet.put(key, downloader);
-			}else{
-				//如果在下载中，就不再下载
+			} else {
+				// 如果在下载中，就不再下载
 				callback.onProgressChanged(downloader.getDownloadFile(), 1);
 				return false;
 			}
@@ -201,7 +200,7 @@ public class DownloadManager {
 		long fileSize = paramsWrapper.getFileSize();
 
 		FileDownloader downloader = new FileDownloader(resUrl, filePath,
-				fileName, fileSize, key); 
+				fileName, fileSize, key);
 		downloader.setOperator(this.mOperator);
 		if (this.mConfig != null) {
 			downloader.setConfig(this.mConfig);
@@ -226,7 +225,7 @@ public class DownloadManager {
 			this.mDownloader.startTask();
 		}
 	}
-	
+
 	private class StopDownThread implements Runnable {
 		private FileDownloader mStopDown;
 
