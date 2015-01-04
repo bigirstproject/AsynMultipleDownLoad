@@ -10,13 +10,14 @@ public class DownLoadParcel implements Serializable {
 
 	public static final int START = 0;
 	public static final int DOWNING = 1;
-	public static final int CONTINUE = 2;
-	public static final int INTERRUPT = 3;
-	public static final int COMPLETE  = 4;
+	public static final int CONTINUE = 4;
+	public static final int INTERRUPT =3;
+	public static final int COMPLETE  = 5;
 	
 	private int id;
 	private String url;
 	private String name;
+	private String key;
 	private String filePath;
 	private int progress;
 	private int downStatus;
@@ -67,6 +68,14 @@ public class DownLoadParcel implements Serializable {
 
 	public void setDownStatus(int downStatus) {
 		this.downStatus = downStatus;
+	}
+
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 
 }

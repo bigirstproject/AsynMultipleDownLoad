@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="list_item_bg">#ca5e5e</color>
+    <color name="list_item_pressed">#63281c</color>
+
+</resources>

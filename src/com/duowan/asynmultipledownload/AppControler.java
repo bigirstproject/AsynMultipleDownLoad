@@ -49,6 +49,9 @@ public final class AppControler {
 		DownloadServiceUtil.unbindFromService(mDownloadServiceToken);
 		mApplication
 				.stopService(new Intent(mApplication, DownloadService.class));
+		mAppControler = null;
+		mApplication =null;
+		mDownloadServiceToken =null;
 	}
 
 }

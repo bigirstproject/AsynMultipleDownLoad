@@ -90,19 +90,20 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 			} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_downing));
-			} else if (item.getDownStatus() == DownLoadParcel.CONTINUE) {
+			} else if (item.getDownStatus() == DownLoadParcel.CONTINUE
+					|| item.getDownStatus() == DownLoadParcel.INTERRUPT) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_continue));
 			} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_complete));
-				viewHolder.start.setOnClickListener(null);
+				// viewHolder.start.setOnClickListener(null);
 			} else {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_start));
-				viewHolder.start.setOnClickListener(null);
+				// viewHolder.start.setOnClickListener(null);
 			}
-			if (item.getProgress() > 0) {
+			if (item != null && item.getProgress() >= 0) {
 				viewHolder.progress.setText(item.getProgress() + "%");
 			} else {
 				viewHolder.progress.setText("0%");
@@ -141,10 +142,14 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 								.getFilePath(), new AppDownloadProListener(
 								myHandler));
 					} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
-						ToastShowUtil.showMsgShort(
-								mContext,
-								mContext.getResources().getString(
-										R.string.down_load_complete_title));
+						item.setDownStatus(DownLoadParcel.DOWNING);
+						DownloadServiceUtil.download(item.getUrl(), item
+								.getFilePath(), new AppDownloadProListener(
+								myHandler));
+						// ToastShowUtil.showMsgShort(
+						// mContext,
+						// mContext.getResources().getString(
+						// R.string.down_load_complete_title));
 					}
 					notifyDataInvalidated();
 				} else {

@@ -114,18 +114,30 @@ public class FileDownloader {
 
 		List<DownloadFile> files = this.operator.queryFile(selection,
 				selectionArgs);
-		if ((files != null) && (files.size() > 0)) {
-			DownloadFile tempFile = (DownloadFile) files.get(0);
-			this.downloadFile.setId(tempFile.getId());
-			this.downloadFile.setHaveRead(tempFile.getHaveRead());
-			this.downloadFile.setState(tempFile.getState());
-			this.downloadFile.setFilePath(tempFile.getFilePath());
-			this.downloadFile.setFileSize(tempFile.getFileSize());
-			this.filePath = tempFile.getFilePath();
-		} else {
-			long id = this.operator.insertFile(this.downloadFile);
-			this.downloadFile.setId(id);
-		}
+			if ((files != null) && (files.size() > 0)) {
+				DownloadFile tempFile = (DownloadFile) files.get(0);
+				File file = new File(tempFile.getFilePath());
+				if(file.exists()){
+					this.downloadFile.setId(tempFile.getId());
+					this.downloadFile.setHaveRead(tempFile.getHaveRead());
+					this.downloadFile.setState(tempFile.getState());
+					this.downloadFile.setFilePath(tempFile.getFilePath());
+					this.downloadFile.setFileSize(tempFile.getFileSize());
+					this.filePath = tempFile.getFilePath();
+				}else{
+					this.downloadFile.setId(tempFile.getId());
+					this.downloadFile.setHaveRead(0);
+					this.downloadFile.setState(0);
+					this.downloadFile.setFilePath(tempFile.getFilePath());
+					this.downloadFile.setFileSize(tempFile.getFileSize());
+					this.filePath = tempFile.getFilePath();
+					this.operator.updateFile(downloadFile);
+				}
+			} else {
+				long id = this.operator.insertFile(this.downloadFile);
+				this.downloadFile.setId(id);
+			}
+		
 	}
 
 	public void startTask() {
@@ -206,7 +218,8 @@ public class FileDownloader {
 		if ((isRange) && (isBlock)) {
 			taskNum = this.configWrapper.getTaskNum();
 		}
-		Logger.debug("test", "isRange = "+isRange +"     isBlock = "+isBlock + "   taskNum = "+taskNum);
+		Logger.debug("test", "isRange = " + isRange + "     isBlock = "
+				+ isBlock + "   taskNum = " + taskNum);
 		startDownloadTasks(taskNum);
 	}
 
