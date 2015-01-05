@@ -48,16 +48,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		new Thread() {
-			public void run() {
-				try {
-					Thread.sleep(500);
-					mBaseAdapter.registerCallback();
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			};
-		}.start();
+		mBaseAdapter.registerCallback();
 	}
 
 	@Override

@@ -1,5 +1,6 @@
 package com.duowan.asynmultipledownload;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import android.app.Service;
@@ -24,6 +25,8 @@ public class DownloadServiceUtil {
 
 	private static HashMap<Context, ServiceBinder> sConnectionMap = new HashMap<Context, ServiceBinder>();
 
+	protected static ArrayList<IProgressListener> mCallbacks = new ArrayList<IProgressListener>();
+
 	public static class DownloadServiceToken {
 		ContextWrapper mWrappedContext;
 
@@ -36,6 +39,10 @@ public class DownloadServiceUtil {
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			sService = (IDownloadService) service;
+			for (int i = 0; i < mCallbacks.size(); i++) {
+				sService.registerCallback(mCallbacks.remove(i));
+			}
+			mCallbacks = null;
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -172,12 +179,22 @@ public class DownloadServiceUtil {
 	public static void registerCallback(IProgressListener listener) {
 		if (checkServiceBinded()) {
 			sService.registerCallback(listener);
+		} else {
+			synchronized (mCallbacks) {
+				if (!mCallbacks.contains(listener)) {
+					mCallbacks.add(listener);
+				}
+			}
 		}
 	}
 
 	public static void removeCallback(IProgressListener listener) {
 		if (checkServiceBinded()) {
 			sService.removeCallback(listener);
+		} else {
+			synchronized (mCallbacks) {
+				mCallbacks.remove(listener);
+			}
 		}
 	}
 
