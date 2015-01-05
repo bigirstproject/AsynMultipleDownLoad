@@ -8,11 +8,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import com.duowan.asynmultipledownload.AppControler;
 import com.duowan.asynmultipledownload.DownloadOperator;
 import com.duowan.asynmultipledownload.R;
 import com.duowan.download.DownloadFile;
 import com.duowan.util.FileUtil;
+import com.duowan.util.LogCat;
 
 public class MainActivity extends Activity {
 
@@ -46,9 +46,31 @@ public class MainActivity extends Activity {
 	}
 
 	@Override
+	protected void onResume() {
+		super.onResume();
+		new Thread() {
+			public void run() {
+				try {
+					Thread.sleep(500);
+					mBaseAdapter.registerCallback();
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			};
+		}.start();
+	}
+
+	@Override
+	protected void onStop() {
+		super.onStop();
+	}
+
+	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		AppControler.getInstance().exit();
+		mBaseAdapter.removeCallback();
+		LogCat.d("MainActivity onDestroy() ");
+		// AppControler.getInstance().exit();
 	}
 
 	class MyAsyTask extends AsyncTask<Void, Void, Boolean> {
@@ -71,10 +93,13 @@ public class MainActivity extends Activity {
 				for (int i = downloads.size() - 1; i >= 0; i--) {
 					DownloadFile downloadFile = downloads.get(i);
 					if (downloadFile.getKey().equals(key)) {
-						if(FileUtil.fileIsExist(downloadFile.getFilePath())){
+						if (FileUtil.fileIsExist(downloadFile.getFilePath())) {
 							mList.get(j).setDownStatus(downloadFile.getState());
-							mList.get(j).setProgress((int) ((downloadFile.getHaveRead() * 100) / downloadFile.getFileSize()));
-						}else{
+							mList.get(j)
+									.setProgress(
+											(int) ((downloadFile.getHaveRead() * 100) / downloadFile
+													.getFileSize()));
+						} else {
 							mList.get(j).setDownStatus(DownLoadParcel.START);
 							mList.get(j).setProgress(0);
 						}
@@ -90,9 +115,10 @@ public class MainActivity extends Activity {
 		@Override
 		protected void onPostExecute(Boolean result) {
 			super.onPostExecute(result);
-			if(result){
+			if (result) {
 				mBaseAdapter.notifyDataSetChanged();
 			}
 		}
 	}
+
 }

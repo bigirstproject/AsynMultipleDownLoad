@@ -21,6 +21,8 @@ public interface IDownloadService {
 
 	void stopDownload(String key);
 
+	void stopAllDownload();
+
 	void removeFromWaittingQueue(String key);
 
 	void removeFromDownloadingSet(String key);
@@ -32,5 +34,9 @@ public interface IDownloadService {
 	DownloadFile getDownloadFile(String key);
 
 	int getProgress(String key);
+
+	void registerCallback(IProgressListener listener);
+
+	void removeCallback(IProgressListener listener);
 
 }

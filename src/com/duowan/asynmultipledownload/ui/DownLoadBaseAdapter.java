@@ -27,6 +27,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 	private LayoutInflater mInflater;
 	private ArrayList<DownLoadParcel> mList;
 	private MyHandle myHandler;
+	private AppDownloadProListener listener;
 
 	public DownLoadBaseAdapter(Context context) {
 		this.mContext = context;
@@ -113,6 +114,15 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 		return convertView;
 	}
 
+	public void registerCallback() {
+		listener = new AppDownloadProListener(myHandler);
+		DownloadServiceUtil.registerCallback(listener);
+	}
+
+	public void removeCallback() {
+		DownloadServiceUtil.removeCallback(listener);
+	}
+
 	class onItemClick implements OnClickListener {
 		int position;
 		DownLoadParcel item;
@@ -130,30 +140,22 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						&& !TextUtils.isEmpty(item.getFilePath())) {
 					if (item.getDownStatus() == DownLoadParcel.START) {
 						item.setDownStatus(DownLoadParcel.DOWNING);
-						DownloadServiceUtil.download(item.getUrl(), item
-								.getFilePath(), new AppDownloadProListener(
-								myHandler));
+						DownloadServiceUtil.download(item.getUrl(),
+								item.getFilePath(), null);
 					} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
 						item.setDownStatus(DownLoadParcel.CONTINUE);
 						DownloadServiceUtil.stopDownload(item.getUrl());
-					} else if (item.getDownStatus() == DownLoadParcel.CONTINUE) {
+					} else if (item.getDownStatus() == DownLoadParcel.CONTINUE
+							|| item.getDownStatus() == DownLoadParcel.INTERRUPT) {
 						item.setDownStatus(DownLoadParcel.DOWNING);
-						DownloadServiceUtil.download(item.getUrl(), item
-								.getFilePath(), new AppDownloadProListener(
-								myHandler));
+						DownloadServiceUtil.download(item.getUrl(),
+								item.getFilePath(), null);
 					} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
 						item.setDownStatus(DownLoadParcel.DOWNING);
-						DownloadServiceUtil.download(item.getUrl(), item
-								.getFilePath(), new AppDownloadProListener(
-								myHandler));
-						// ToastShowUtil.showMsgShort(
-						// mContext,
-						// mContext.getResources().getString(
-						// R.string.down_load_complete_title));
+						DownloadServiceUtil.download(item.getUrl(),
+								item.getFilePath(), null);
 					}
 					notifyDataInvalidated();
-				} else {
-					ToastShowUtil.showMsgShort(mContext, "item = null");
 				}
 				break;
 			default:

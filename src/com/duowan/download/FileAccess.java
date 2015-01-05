@@ -4,6 +4,8 @@ import java.io.BufferedInputStream;
 import java.io.InputStream;
 import java.io.RandomAccessFile;
 
+import com.duowan.util.LogCat;
+
 class FileAccess {
 	public static final int DEFAULT_BUFFER_SIZE = 16384;
 	private IProgressListener progressListener;
@@ -79,11 +81,13 @@ class FileAccess {
 					return -1L;
 				}
 			}
+			LogCat.d("saveFile onDestroy() ");
 			return haveRead;
 		} catch (Exception e) {
 			return -1L;
 		} finally {
 			try {
+				LogCat.d("randomAccessFile onDestroy() ");
 				randomAccessFile.close();
 			} catch (Exception localException4) {
 			}

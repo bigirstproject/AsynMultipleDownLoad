@@ -1,15 +1,21 @@
 package com.duowan.asynmultipledownload;
 
+import java.util.ArrayList;
+
 import android.content.Intent;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 
 import com.duowan.download.DownloadFile;
 import com.duowan.download.IConfig;
 import com.duowan.download.IOperator;
 import com.duowan.download.IProgressListener;
 import com.duowan.download.manager.DownloadManager;
+import com.duowan.download.manager.DownloadProListener;
 import com.duowan.download.manager.ParamsWrapper;
+import com.duowan.util.LogCat;
 
 /**
  * 下载服务
@@ -17,9 +23,13 @@ import com.duowan.download.manager.ParamsWrapper;
  */
 public abstract class BaseDownloadService extends BaseService {
 
-	private DownloadManager mDownloadManager;
+	protected MyHandle mHandle;
+	protected ArrayList<IProgressListener> mCallbacks;
+	protected DownloadManager mDownloadManager;
 
 	public void onCreate() {
+		mHandle = new MyHandle();
+		mCallbacks = new ArrayList<IProgressListener>();
 		mDownloadManager = new DownloadManager(createOperator(),
 				KGLog.isDebug());
 		IConfig config = createConfig();
@@ -33,9 +43,18 @@ public abstract class BaseDownloadService extends BaseService {
 		return mBinder;
 	}
 
+	public DownloadManager getmDownloadManager() {
+		return mDownloadManager;
+	}
+
+	public ArrayList<IProgressListener> getmCallbacks() {
+		return mCallbacks;
+	}
+
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
+		LogCat.d("onDestroy() = "+getmCallbacks().size());
 		mDownloadManager.stopAll();
 	}
 
@@ -53,27 +72,66 @@ public abstract class BaseDownloadService extends BaseService {
 	 */
 	protected abstract IConfig createConfig();
 
+	/**
+	 * 遍历注册的监听器
+	 * 
+	 */
+	protected abstract void invokeCallback(DownloadFile file, int state);
+
+	public class MyHandle extends Handler {
+
+		private final int DOWNLOADING_STATE = 0x10001;
+
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case DOWNLOADING_STATE:
+				if (msg != null && msg.obj instanceof DownloadFile) {
+					DownloadFile file = (DownloadFile) msg.obj;
+					invokeCallback(file, msg.arg1);
+				}
+			default:
+				break;
+			}
+		}
+	}
+
 	private IBinder mBinder = new ServiceStub();
 
-	class ServiceStub extends Binder implements IDownloadService {
+	protected class ServiceStub extends Binder implements IDownloadService {
 
 		@Override
 		public boolean download(String resUrl, String filePath,
 				IProgressListener listener) {
-			return mDownloadManager.download(resUrl, filePath, listener);
+			if (listener != null) {
+				return mDownloadManager.download(resUrl, filePath, listener);
+			} else {
+				return mDownloadManager.download(resUrl, filePath,
+						new DownloadProListener(mHandle));
+			}
 		}
 
 		@Override
 		public boolean download(String resUrl, String filePath, int classId,
 				IProgressListener listener) {
-			return mDownloadManager.download(resUrl, filePath, classId,
-					listener);
+			if (listener != null) {
+				return mDownloadManager.download(resUrl, filePath, classId,
+						listener);
+			} else {
+				return mDownloadManager.download(resUrl, filePath, classId,
+						new DownloadProListener(mHandle));
+			}
 		}
 
 		@Override
 		public boolean download(ParamsWrapper paramsWrapper,
-				IProgressListener callback) {
-			return mDownloadManager.download(paramsWrapper, callback);
+				IProgressListener listener) {
+			if (listener != null) {
+				return mDownloadManager.download(paramsWrapper, listener);
+			} else {
+				return mDownloadManager.download(paramsWrapper,
+						new DownloadProListener(mHandle));
+			}
 		}
 
 		@Override
@@ -84,6 +142,11 @@ public abstract class BaseDownloadService extends BaseService {
 		@Override
 		public void stopDownload(String key) {
 			mDownloadManager.stopDownload(key);
+		}
+		
+		@Override
+		public void stopAllDownload() {
+			mDownloadManager.stopAll();
 		}
 
 		@Override
@@ -114,6 +177,22 @@ public abstract class BaseDownloadService extends BaseService {
 		@Override
 		public int getProgress(String key) {
 			return mDownloadManager.getProgress(key);
+		}
+
+		@Override
+		public void registerCallback(IProgressListener listener) {
+			synchronized (mCallbacks) {
+				if (!mCallbacks.contains(listener)) {
+					mCallbacks.add(listener);
+				}
+			}
+		}
+
+		@Override
+		public void removeCallback(IProgressListener listener) {
+			synchronized (mCallbacks) {
+				mCallbacks.remove(listener);
+			}
 		}
 
 	}

@@ -1,7 +1,5 @@
 package com.duowan.asynmultipledownload;
 
-import android.content.Intent;
-
 import com.duowan.asynmultipledownload.DownloadServiceUtil.DownloadServiceToken;
 import com.duowan.asynmultipledownload.ui.AsynMultipleApplication;
 
@@ -47,11 +45,11 @@ public final class AppControler {
 	 */
 	public void exit() {
 		DownloadServiceUtil.unbindFromService(mDownloadServiceToken);
-		mApplication
-				.stopService(new Intent(mApplication, DownloadService.class));
-		mAppControler = null;
-		mApplication =null;
-		mDownloadServiceToken =null;
+		// mApplication
+		// .stopService(new Intent(mApplication, DownloadService.class));
+		// mAppControler = null;
+		// mApplication =null;
+		// mDownloadServiceToken =null;
 	}
 
 }

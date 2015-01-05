@@ -53,7 +53,7 @@ public class DownloadManager {
 
 	public boolean download(String resUrl, String filePath, int classId,
 			IProgressListener listener) {
-		ParamsWrapper paramsWrapper = new ParamsWrapper();
+		ParamsWrapper paramsWrapper = new ParamsWrapper();  
 		paramsWrapper.setKey(resUrl);
 		paramsWrapper.setClassId(classId);
 		paramsWrapper.setResUrl(resUrl);
