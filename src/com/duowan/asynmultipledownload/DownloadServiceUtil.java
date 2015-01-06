@@ -2,6 +2,7 @@ package com.duowan.asynmultipledownload;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import android.app.Service;
 import android.content.ComponentName;
@@ -11,7 +12,10 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.IBinder;
 
+import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
+import com.duowan.asynmultipledownload.bean.BindBeforeComponent;
 import com.duowan.download.DownloadFile;
+import com.duowan.download.FileDownloader;
 import com.duowan.download.IProgressListener;
 import com.duowan.download.manager.ParamsWrapper;
 
@@ -25,7 +29,7 @@ public class DownloadServiceUtil {
 
 	private static HashMap<Context, ServiceBinder> sConnectionMap = new HashMap<Context, ServiceBinder>();
 
-	protected static ArrayList<IProgressListener> mCallbacks = new ArrayList<IProgressListener>();
+	protected static ArrayList<BindBeforeComponent> mCallbacks = new ArrayList<BindBeforeComponent>();
 
 	public static class DownloadServiceToken {
 		ContextWrapper mWrappedContext;
@@ -39,10 +43,19 @@ public class DownloadServiceUtil {
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			sService = (IDownloadService) service;
-			for (int i = 0; i < mCallbacks.size(); i++) {
-				sService.registerCallback(mCallbacks.remove(i));
+			if (mCallbacks != null && mCallbacks.size() > 0) {
+				for (int i = 0; i < mCallbacks.size(); i++) {
+					BindBeforeComponent component = mCallbacks.remove(i);
+					if (component.getListener() != null
+							&& component.getDownloadManager() != null) {
+						sService.registerCallback(component.getListener(),
+								component.getDownloadManager());
+					} else if (component.getListener() != null){
+						sService.registerCallback(component.getListener());
+					}
+				}
+				mCallbacks = null;
 			}
-			mCallbacks = null;
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
@@ -154,7 +167,25 @@ public class DownloadServiceUtil {
 		} else {
 			synchronized (mCallbacks) {
 				if (!mCallbacks.contains(listener)) {
-					mCallbacks.add(listener);
+					BindBeforeComponent component = new BindBeforeComponent();
+					component.setListener(listener);
+					mCallbacks.add(component);
+				}
+			}
+		}
+	}
+
+	public static void registerCallback(IProgressListener listener,
+			IDownloadManagerCallBackListener callBackListener) {
+		if (checkServiceBinded()) {
+			sService.registerCallback(listener, callBackListener);
+		} else {
+			synchronized (mCallbacks) {
+				if (!mCallbacks.contains(listener)) {
+					BindBeforeComponent component = new BindBeforeComponent();
+					component.setListener(listener);
+					component.setDownloadManager(callBackListener);
+					mCallbacks.add(component);
 				}
 			}
 		}
@@ -168,6 +199,20 @@ public class DownloadServiceUtil {
 				mCallbacks.remove(listener);
 			}
 		}
+	}
+
+	public HashMap<String, FileDownloader> getDownloadingSet() {
+		if (checkServiceBinded()) {
+			return sService.getDownloadingSet();
+		}
+		return null;
+	}
+
+	public LinkedList<FileDownloader> getWaittingList() {
+		if (checkServiceBinded()) {
+			return sService.getWaittingList();
+		}
+		return null;
 	}
 
 }

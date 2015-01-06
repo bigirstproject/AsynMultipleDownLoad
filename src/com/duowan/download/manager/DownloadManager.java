@@ -88,8 +88,8 @@ public class DownloadManager {
 				synchronized (this.mDownloadingSet) {
 					if (!(this.mDownloadingSet.containsKey(key))) {
 						this.mDownloadingSet.put(key, downloader);
-						this.mExecutorDownService
-						.execute(new DownloadThread(downloader));
+						this.mExecutorDownService.execute(new DownloadThread(
+								downloader));
 					}
 				}
 				return true;
@@ -136,22 +136,6 @@ public class DownloadManager {
 					listener.onProgressChanged(mWaittingList.get(i)
 							.getDownloadFile(), FileDownloader.INTERUPT);
 					mWaittingList.remove(i);
-					break;
-				}
-			}
-		}
-	}
-	
-	public void sendWaittingListAndMessage(String key) {
-		for (int i = 0; i < mWaittingList.size(); i++) {
-			if (mWaittingList.get(i).getDownloadFile().getKey().equals(key)) {
-				synchronized (this.mWaittingList) {
-					IProgressListener listener = mWaittingList.get(i)
-							.getProgressListener();
-					mWaittingList.get(i).getDownloadFile()
-							.setState(FileDownloader.INTERUPT);
-					listener.onProgressChanged(mWaittingList.get(i)
-							.getDownloadFile(), FileDownloader.INTERUPT);
 					break;
 				}
 			}
@@ -214,6 +198,14 @@ public class DownloadManager {
 			}
 		}
 		return 0;
+	}
+
+	public HashMap<String, FileDownloader> getDownloadingSet() {
+		return mDownloadingSet;
+	}
+
+	public LinkedList<FileDownloader> getWaittingList() {
+		return mWaittingList;
 	}
 
 	public void stopAll() {

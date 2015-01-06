@@ -1,6 +1,8 @@
 package com.duowan.asynmultipledownload;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import android.content.Intent;
 import android.os.Binder;
@@ -8,6 +10,7 @@ import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
+import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;
 import com.duowan.download.IConfig;
@@ -88,9 +91,6 @@ public abstract class BaseDownloadService extends BaseService {
 			switch (msg.what) {
 			case DOWNLOADING_STATE:
 				if (msg != null && msg.obj instanceof DownloadFile) {
-					if(msg.arg1 == FileDownloader.INTERUPT){
-						
-					}
 					DownloadFile file = (DownloadFile) msg.obj;
 					invokeCallback(file, msg.arg1);
 					if (!(msg.arg1 == FileDownloader.PREPAREING
@@ -181,12 +181,33 @@ public abstract class BaseDownloadService extends BaseService {
 				}
 			}
 		}
+		
+		@Override
+		public void registerCallback(IProgressListener listener,
+				IDownloadManagerCallBackListener callBackListener) {
+			synchronized (mCallbacks) {
+				if (!mCallbacks.contains(listener)) {
+					mCallbacks.add(listener);
+				}
+			}
+			callBackListener.setCallBackDownloadManagerLitener(mDownloadManager);
+		}
 
 		@Override
 		public void removeCallback(IProgressListener listener) {
 			synchronized (mCallbacks) {
 				mCallbacks.remove(listener);
 			}
+		}
+
+		@Override
+		public HashMap<String, FileDownloader> getDownloadingSet() {
+			return mDownloadManager.getDownloadingSet();
+		}
+
+		@Override
+		public LinkedList<FileDownloader> getWaittingList() {
+			return mDownloadManager.getWaittingList();
 		}
 
 	}

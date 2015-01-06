@@ -153,7 +153,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownloadServiceUtil.stopDownload(item.getUrl());
 					} else if (item.getDownStatus() == DownLoadParcel.CONTINUE
 							|| item.getDownStatus() == DownLoadParcel.INTERRUPT) {
-						item.setDownStatus(DownLoadParcel.DOWNING);
+						item.setDownStatus(DownLoadParcel.READY);
 						DownloadServiceUtil.download(item.getUrl(),
 								item.getFilePath(), null);
 					} else if (item.getDownStatus() == DownLoadParcel.FINISH) {

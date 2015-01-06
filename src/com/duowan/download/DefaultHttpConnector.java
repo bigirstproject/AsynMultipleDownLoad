@@ -49,14 +49,19 @@ class DefaultHttpConnector implements IHttpConnector {
 		if ((responseCode == 200) || (responseCode == 206)) {
 			contentLength = this.httpConn.getContentLength();
 			LogCat.d("getContentLength  enter is " + System.currentTimeMillis());
-			this.httpConn.disconnect();
+			close();
 			LogCat.d("getContentLength  out  is " + System.currentTimeMillis());
 		}
 		return contentLength;
 	}
 
 	public void close() throws Exception {
-		this.httpConn.disconnect();
+		new Thread(){
+			public void run() {
+				httpConn.disconnect();
+				LogCat.d("httpConn  is  close " + System.currentTimeMillis());
+			};
+		}.start();
 	}
 
 	private HttpURLConnection create(String resUrl) throws Exception {
