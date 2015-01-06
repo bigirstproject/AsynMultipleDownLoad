@@ -26,4 +26,6 @@ public abstract interface IConfig
   public abstract Hashtable<String, String> getRequestHeaders();
 
   public abstract boolean is2GNeedToForceBlock();
+  
+  public abstract int maxLoadingNums();
 }

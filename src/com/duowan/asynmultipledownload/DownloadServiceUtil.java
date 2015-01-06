@@ -85,14 +85,6 @@ public class DownloadServiceUtil {
 		return isRunning;
 	}
 
-	/**
-	 * обть
-	 * 
-	 * @param resUrl
-	 * @param filePath
-	 * @param listener
-	 * @return
-	 */
 	public static boolean download(String resUrl, String filePath,
 			IProgressListener listener) {
 		if (checkServiceBinded()) {
@@ -117,13 +109,6 @@ public class DownloadServiceUtil {
 		return false;
 	}
 
-	public static boolean addToWaittingQueue(ParamsWrapper paramsWrapper) {
-		if (checkServiceBinded()) {
-			return sService.addToWaittingQueue(paramsWrapper);
-		}
-		return false;
-	}
-
 	public static void stopDownload(String key) {
 		if (checkServiceBinded()) {
 			sService.stopDownload(key);
@@ -136,12 +121,6 @@ public class DownloadServiceUtil {
 		}
 	}
 
-	public static void removeFromWaittingQueue(String key) {
-		if (checkServiceBinded()) {
-			sService.removeFromWaittingQueue(key);
-		}
-	}
-
 	public static void removeFromDownloadingSet(String key) {
 		if (checkServiceBinded()) {
 			sService.removeFromDownloadingSet(key);
@@ -151,13 +130,6 @@ public class DownloadServiceUtil {
 	public static boolean isDownloading(String key) {
 		if (checkServiceBinded()) {
 			return sService.isDownloading(key);
-		}
-		return false;
-	}
-
-	public static boolean isInWaittingQueue(String key) {
-		if (checkServiceBinded()) {
-			return sService.isInWaittingQueue(key);
 		}
 		return false;
 	}

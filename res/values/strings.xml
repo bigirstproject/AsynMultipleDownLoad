@@ -4,9 +4,11 @@
     <string name="app_name">AsynMultipleDownLoad</string>
     <string name="action_settings">Settings</string>
     <string name="down_load_start">下载</string>
+     <string name="down_load_waiting">等待中</string>
     <string name="down_load_downing">下载中...</string>
     <string name="down_load_continue">继续</string>
     <string name="down_load_interrupt">中断</string>
+    <string name="down_load_interrupting">暂停中</string>
     <string name="down_load_complete">完成</string>
     <string name="down_load_complete_title">已下载完成</string>
     <string name="down_load_initial_progress">0%</string>

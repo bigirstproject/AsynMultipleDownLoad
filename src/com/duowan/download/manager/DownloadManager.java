@@ -2,7 +2,6 @@ package com.duowan.download.manager;
 
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.Queue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -12,6 +11,7 @@ import com.duowan.download.IConfig;
 import com.duowan.download.IOperator;
 import com.duowan.download.IProgressListener;
 import com.duowan.download.Logger;
+import com.duowan.util.LogCat;
 
 public class DownloadManager {
 	public static final int NOTIFY_PROGRESS = 1;
@@ -19,7 +19,7 @@ public class DownloadManager {
 	private ExecutorService mExecutorDownService;
 	private ExecutorService mExecutorStopService;
 	private HashMap<String, FileDownloader> mDownloadingSet;
-	private Queue<ParamsWrapper> mWaittingQueue;
+	private LinkedList<FileDownloader> mWaittingList;
 	private IOperator mOperator;
 	private IConfig mConfig;
 
@@ -27,7 +27,7 @@ public class DownloadManager {
 		this.mExecutorDownService = Executors.newCachedThreadPool();
 		this.mExecutorStopService = Executors.newCachedThreadPool();
 		this.mDownloadingSet = new HashMap<String, FileDownloader>();
-		this.mWaittingQueue = new LinkedList<ParamsWrapper>();
+		this.mWaittingList = new LinkedList<FileDownloader>();
 		this.mOperator = operator;
 		if (this.mOperator == null) {
 			throw new IllegalArgumentException("operator can not be null.");
@@ -53,7 +53,7 @@ public class DownloadManager {
 
 	public boolean download(String resUrl, String filePath, int classId,
 			IProgressListener listener) {
-		ParamsWrapper paramsWrapper = new ParamsWrapper();  
+		ParamsWrapper paramsWrapper = new ParamsWrapper();
 		paramsWrapper.setKey(resUrl);
 		paramsWrapper.setClassId(classId);
 		paramsWrapper.setResUrl(resUrl);
@@ -66,50 +66,107 @@ public class DownloadManager {
 	public boolean download(ParamsWrapper paramsWrapper,
 			IProgressListener callback) {
 		FileDownloader downloader = createTask(paramsWrapper);
-		String key = paramsWrapper.getKey();
-		synchronized (this.mDownloadingSet) {
-			if (!(this.mDownloadingSet.containsKey(key))) {
-				this.mDownloadingSet.put(key, downloader);
-			} else {
-				// 如果在下载中，就不再下载
-				callback.onProgressChanged(downloader.getDownloadFile(), 1);
-				return false;
-			}
-		}
 		DownloadProgressListener listener = new DownloadProgressListener(this);
 		if (callback != null) {
 			listener.setCallback(callback);
 		}
 		downloader.setProgressListener(listener);
-
-		this.mExecutorDownService.execute(new DownloadThread(downloader));
-		return true;
+		addToWaittingQueue(downloader);
+		downNextWaittingQueueWrapper();
+		return false;
 	}
 
-	public boolean addToWaittingQueue(ParamsWrapper paramsWrapper) {
-		synchronized (this.mWaittingQueue) {
-			if (!(this.mWaittingQueue.contains(paramsWrapper))) {
-				createTask(paramsWrapper);
-				return this.mWaittingQueue.offer(paramsWrapper);
+	public boolean downNextWaittingQueueWrapper() {
+		LogCat.d("downNextWaittingQueueWrapper  mWaittingList.size() is "
+				+ mWaittingList.size());
+		synchronized (this.mWaittingList) {
+			if (mWaittingList != null && mWaittingList.size() > 0
+					&& mConfig != null
+					&& mConfig.maxLoadingNums() > mDownloadingSet.size()) {
+				FileDownloader downloader = mWaittingList.remove(0);
+				String key = downloader.getDownloadFile().getKey();
+				synchronized (this.mDownloadingSet) {
+					if (!(this.mDownloadingSet.containsKey(key))) {
+						this.mDownloadingSet.put(key, downloader);
+						this.mExecutorDownService
+						.execute(new DownloadThread(downloader));
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean addToWaittingQueue(FileDownloader downloader) {
+		synchronized (this.mWaittingList) {
+			if (!(this.mWaittingList.contains(downloader))) {
+				return this.mWaittingList.add(downloader);
 			}
 			return false;
 		}
 	}
 
-	public void stopDownload(String key) {
-		synchronized (this.mDownloadingSet) {
-			FileDownloader downloader = (FileDownloader) this.mDownloadingSet
-					.remove(key);
-			if (downloader != null)
-				mExecutorStopService.execute(new StopDownThread(downloader));
+	public boolean isInWaittingQueue(String key) {
+		synchronized (this.mWaittingList) {
+			ParamsWrapper paramsWrapper = new ParamsWrapper();
+			paramsWrapper.setKey(key);
+			FileDownloader downloader = createTask(paramsWrapper);
+			return this.mWaittingList.contains(downloader);
 		}
 	}
 
-	public void removeFromWaittingQueue(String key) {
-		synchronized (this.mWaittingQueue) {
-			ParamsWrapper paramsWrapper = new ParamsWrapper();
-			paramsWrapper.setKey(key);
-			this.mWaittingQueue.remove(paramsWrapper);
+	// public void removeFromWaittingList(String key) {
+	// synchronized (this.mWaittingList) {
+	// ParamsWrapper paramsWrapper = new ParamsWrapper();
+	// paramsWrapper.setKey(key);
+	// FileDownloader downloader = createTask(paramsWrapper);
+	// this.mWaittingList.remove(downloader);
+	// }
+	// }
+
+	public void removeFromWaittingListAndMessage(String key) {
+		for (int i = 0; i < mWaittingList.size(); i++) {
+			if (mWaittingList.get(i).getDownloadFile().getKey().equals(key)) {
+				synchronized (this.mWaittingList) {
+					IProgressListener listener = mWaittingList.get(i)
+							.getProgressListener();
+					mWaittingList.get(i).getDownloadFile()
+							.setState(FileDownloader.INTERUPT);
+					listener.onProgressChanged(mWaittingList.get(i)
+							.getDownloadFile(), FileDownloader.INTERUPT);
+					mWaittingList.remove(i);
+					break;
+				}
+			}
+		}
+	}
+	
+	public void sendWaittingListAndMessage(String key) {
+		for (int i = 0; i < mWaittingList.size(); i++) {
+			if (mWaittingList.get(i).getDownloadFile().getKey().equals(key)) {
+				synchronized (this.mWaittingList) {
+					IProgressListener listener = mWaittingList.get(i)
+							.getProgressListener();
+					mWaittingList.get(i).getDownloadFile()
+							.setState(FileDownloader.INTERUPT);
+					listener.onProgressChanged(mWaittingList.get(i)
+							.getDownloadFile(), FileDownloader.INTERUPT);
+					break;
+				}
+			}
+		}
+	}
+
+	public void stopDownload(String key) {
+		if (isInWaittingQueue(key)) {
+			removeFromWaittingListAndMessage(key);
+		} else {
+			FileDownloader downloader = (FileDownloader) this.mDownloadingSet
+					.remove(key);
+			if (downloader != null) {
+				mExecutorStopService.execute(new StopDownThread(downloader));
+			}
 		}
 	}
 
@@ -122,14 +179,6 @@ public class DownloadManager {
 	public boolean isDownloading(String key) {
 		synchronized (this.mDownloadingSet) {
 			return this.mDownloadingSet.containsKey(key);
-		}
-	}
-
-	public boolean isInWaittingQueue(String key) {
-		synchronized (this.mWaittingQueue) {
-			ParamsWrapper paramsWrapper = new ParamsWrapper();
-			paramsWrapper.setKey(key);
-			return this.mWaittingQueue.contains(paramsWrapper);
 		}
 	}
 
@@ -170,8 +219,8 @@ public class DownloadManager {
 	public void stopAll() {
 		new Thread(new Runnable() {
 			public void run() {
-				synchronized (DownloadManager.this.mWaittingQueue) {
-					DownloadManager.this.mWaittingQueue.clear();
+				synchronized (DownloadManager.this.mWaittingList) {
+					DownloadManager.this.mWaittingList.clear();
 				}
 
 				synchronized (DownloadManager.this.mDownloadingSet) {

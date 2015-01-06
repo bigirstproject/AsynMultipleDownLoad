@@ -17,19 +17,13 @@ public interface IDownloadService {
 
 	boolean download(ParamsWrapper paramsWrapper, IProgressListener callback);
 
-	boolean addToWaittingQueue(ParamsWrapper paramsWrapper);
-
 	void stopDownload(String key);
 
 	void stopAllDownload();
 
-	void removeFromWaittingQueue(String key);
-
 	void removeFromDownloadingSet(String key);
 
 	boolean isDownloading(String key);
-
-	boolean isInWaittingQueue(String key);
 
 	DownloadFile getDownloadFile(String key);
 

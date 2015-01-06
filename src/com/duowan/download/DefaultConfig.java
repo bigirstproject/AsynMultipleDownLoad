@@ -53,4 +53,9 @@ public class DefaultConfig implements IConfig {
 	public boolean is2GNeedToForceBlock() {
 		return true;
 	}
+
+	@Override
+	public int maxLoadingNums() {
+		return 2;
+	}
 }

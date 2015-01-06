@@ -5,12 +5,15 @@ import java.io.RandomAccessFile;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.duowan.util.LogCat;
+
 public class FileDownloader {
-	public static final int PREPAREING = 1;
-	public static final int READY = 2;
-	public static final int DOWNLOADING = 3;
-	public static final int INTERUPT = 4;
-	public static final int FINISH = 5;
+	public static final int PREPAREING = 1;// 准备中
+	public static final int READY = 2;// 等待中
+	public static final int DOWNLOADING = 3;// 下载中
+	public static final int INTERUPT = 4;// 中断（暂停）
+	public static final int FINISH = 5;// 完成（成功）
+	public static final int INTERUPTING = 6;// 暂停中
 	public static final int CREATE_FILE_ERROR = 10;
 	public static final int GET_FILE_SIZE_ERROR = 11;
 	public static final int TIMEOUT_ERROR = 12;
@@ -76,6 +79,10 @@ public class FileDownloader {
 		this.progressListener = progressListener;
 	}
 
+	public IProgressListener getProgressListener() {
+		return progressListener;
+	}
+
 	public void setConfig(IConfig config) {
 		this.config = config;
 		loadConfig();
@@ -114,30 +121,30 @@ public class FileDownloader {
 
 		List<DownloadFile> files = this.operator.queryFile(selection,
 				selectionArgs);
-			if ((files != null) && (files.size() > 0)) {
-				DownloadFile tempFile = (DownloadFile) files.get(0);
-				File file = new File(tempFile.getFilePath());
-				if(file.exists()){
-					this.downloadFile.setId(tempFile.getId());
-					this.downloadFile.setHaveRead(tempFile.getHaveRead());
-					this.downloadFile.setState(tempFile.getState());
-					this.downloadFile.setFilePath(tempFile.getFilePath());
-					this.downloadFile.setFileSize(tempFile.getFileSize());
-					this.filePath = tempFile.getFilePath();
-				}else{
-					this.downloadFile.setId(tempFile.getId());
-					this.downloadFile.setHaveRead(0);
-					this.downloadFile.setState(0);
-					this.downloadFile.setFilePath(tempFile.getFilePath());
-					this.downloadFile.setFileSize(tempFile.getFileSize());
-					this.filePath = tempFile.getFilePath();
-					this.operator.updateFile(downloadFile);
-				}
+		if ((files != null) && (files.size() > 0)) {
+			DownloadFile tempFile = (DownloadFile) files.get(0);
+			File file = new File(tempFile.getFilePath());
+			if (file.exists()) {
+				this.downloadFile.setId(tempFile.getId());
+				this.downloadFile.setHaveRead(tempFile.getHaveRead());
+				this.downloadFile.setState(tempFile.getState());
+				this.downloadFile.setFilePath(tempFile.getFilePath());
+				this.downloadFile.setFileSize(tempFile.getFileSize());
+				this.filePath = tempFile.getFilePath();
 			} else {
-				long id = this.operator.insertFile(this.downloadFile);
-				this.downloadFile.setId(id);
+				this.downloadFile.setId(tempFile.getId());
+				this.downloadFile.setHaveRead(0);
+				this.downloadFile.setState(0);
+				this.downloadFile.setFilePath(tempFile.getFilePath());
+				this.downloadFile.setFileSize(tempFile.getFileSize());
+				this.filePath = tempFile.getFilePath();
+				this.operator.updateFile(downloadFile);
 			}
-		
+		} else {
+			long id = this.operator.insertFile(this.downloadFile);
+			this.downloadFile.setId(id);
+		}
+
 	}
 
 	public void startTask() {
@@ -241,12 +248,15 @@ public class FileDownloader {
 		else {
 			return;
 		}
+
+		this.fileAccess.setStop(true);
 		int size = this.tasks.size();
+		LogCat.d("stopDownload size is " + size + "   "
+				+ System.currentTimeMillis());
 		for (int i = 0; i < size; ++i) {
 			((AbstractDownloadTask) this.tasks.get(i)).stopDownload();
 		}
-
-		this.fileAccess.setStop(true);
+		LogCat.d("stopDownload file state is B " + System.currentTimeMillis());
 		Logger.debug("stop", "---------" + this.fileName
 				+ " stopDownload----------");
 		if (this.downloadFile.getState() != 5) {
@@ -254,13 +264,15 @@ public class FileDownloader {
 		}
 
 		this.operator.updateFile(this.downloadFile);
-		if (stopReason == 4)
+		if (stopReason == 4) {
+			LogCat.d("stopDownload file state is C "
+					+ System.currentTimeMillis());
 			this.progressListener.onProgressChanged(this.downloadFile, 4);
-		else if (stopReason == 12)
+		} else if (stopReason == 12) {
 			this.progressListener.onError(this.downloadFile, 12);
-		else if (stopReason == 13)
+		} else if (stopReason == 13) {
 			this.progressListener.onError(this.downloadFile, 13);
-		else if (stopReason == 14) {
+		} else if (stopReason == 14) {
 			this.progressListener.onError(this.downloadFile, 14);
 		}
 		this.tasks.clear();

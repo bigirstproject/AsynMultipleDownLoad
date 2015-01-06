@@ -33,12 +33,12 @@ public class MainActivity extends Activity {
 
 	private void addData() {
 		mList = new ArrayList<DownLoadParcel>();
-		for (int i = 0; i < DownLoadUrl.url.length; i++) {
+		for (int i = 0; i < UrlWrapper.url.length; i++) {
 			DownLoadParcel parcel = new DownLoadParcel();
 			parcel.setId(i + 1);
-			parcel.setKey(DownLoadUrl.url[i]);
-			parcel.setUrl(DownLoadUrl.url[i]);
-			parcel.setFilePath(DownLoadUrl.getFilePath(DownLoadUrl.url[i]));
+			parcel.setKey(UrlWrapper.url[i]);
+			parcel.setUrl(UrlWrapper.url[i]);
+			parcel.setFilePath(UrlWrapper.getFilePath(UrlWrapper.url[i]));
 			mList.add(parcel);
 		}
 		mBaseAdapter.setData(mList);

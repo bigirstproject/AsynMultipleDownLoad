@@ -73,15 +73,16 @@ class FileAccess {
 			int read = 0;
 			byte[] buffer = new byte[this.bufferSize];
 			long haveRead = 0L;
-			while ((read = bis.read(buffer)) != -1) {
+			LogCat.d("saveFile start : stop is "+stop);
+			while ((!this.stop)&&(read = bis.read(buffer)) != -1) {
 				haveRead += read;
-
 				saveFile(buffer, 0, read, randomAccessFile, listener);
 				if (this.stop) {
+					LogCat.d("stop savefile ");
 					return -1L;
 				}
 			}
-			LogCat.d("saveFile onDestroy() ");
+			LogCat.d("saveFile onDestroy() : stop is "+stop);
 			return haveRead;
 		} catch (Exception e) {
 			return -1L;

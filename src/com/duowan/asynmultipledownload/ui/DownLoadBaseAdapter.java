@@ -88,14 +88,20 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 			if (item.getDownStatus() == DownLoadParcel.START) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_start));
+			} else if (item.getDownStatus() == DownLoadParcel.READY) {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_waiting));
 			} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_downing));
+			} else if (item.getDownStatus() == DownLoadParcel.INTERUPTING) {
+				viewHolder.start.setText(mContext.getResources().getString(
+						R.string.down_load_interrupting));
 			} else if (item.getDownStatus() == DownLoadParcel.CONTINUE
 					|| item.getDownStatus() == DownLoadParcel.INTERRUPT) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_continue));
-			} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
+			} else if (item.getDownStatus() == DownLoadParcel.FINISH) {
 				viewHolder.start.setText(mContext.getResources().getString(
 						R.string.down_load_complete));
 				// viewHolder.start.setOnClickListener(null);
@@ -139,18 +145,18 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 				if (item != null && !TextUtils.isEmpty(item.getUrl())
 						&& !TextUtils.isEmpty(item.getFilePath())) {
 					if (item.getDownStatus() == DownLoadParcel.START) {
-						item.setDownStatus(DownLoadParcel.DOWNING);
+						item.setDownStatus(DownLoadParcel.READY);
 						DownloadServiceUtil.download(item.getUrl(),
 								item.getFilePath(), null);
 					} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
-						item.setDownStatus(DownLoadParcel.CONTINUE);
+						item.setDownStatus(DownLoadParcel.INTERUPTING);
 						DownloadServiceUtil.stopDownload(item.getUrl());
 					} else if (item.getDownStatus() == DownLoadParcel.CONTINUE
 							|| item.getDownStatus() == DownLoadParcel.INTERRUPT) {
 						item.setDownStatus(DownLoadParcel.DOWNING);
 						DownloadServiceUtil.download(item.getUrl(),
 								item.getFilePath(), null);
-					} else if (item.getDownStatus() == DownLoadParcel.COMPLETE) {
+					} else if (item.getDownStatus() == DownLoadParcel.FINISH) {
 						item.setDownStatus(DownLoadParcel.DOWNING);
 						DownloadServiceUtil.download(item.getUrl(),
 								item.getFilePath(), null);
@@ -169,16 +175,6 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 	public class MyHandle extends Handler {
 
 		private Context mContext;
-
-		private final int UN_CHECKED = 1;
-
-		private final int DOWNLOADING = 4;
-
-		private final int CANCEL_DOWNLOAD = 5;
-
-		private final int ERROR = 6;
-
-		private int mState = UN_CHECKED;
 
 		private final int COMPLETE_DOWNLOAD = 0x10001;
 
@@ -206,7 +202,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(100);
 							downLoadParcel
-									.setDownStatus(DownLoadParcel.COMPLETE);
+									.setDownStatus(DownLoadParcel.FINISH);
 							notifyDataInvalidated();
 							break;
 						}
@@ -233,7 +229,10 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 				break;
 			case INTERUPT_DOWNLOAD:
 				// ÖÐ¶ÏÏÂÔØ
-				ToastShowUtil.showMsgShort(mContext, "INTERUPT_DOWNLOAD");
+				LogCat.d("INTERUPT_DOWNLOAD  msg.arg1  is " + msg.arg1 + "   "
+						+ System.currentTimeMillis());
+				ToastShowUtil.showMsgShort(mContext, "INTERUPT_DOWNLOAD     "
+						+ System.currentTimeMillis());
 				if (msg != null && msg.arg1 >= 0 && msg.obj instanceof String) {
 					String resUrl = (String) msg.obj;
 					Log.d("test", resUrl + " = " + msg.arg1);

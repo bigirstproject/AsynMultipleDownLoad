@@ -8,6 +8,8 @@ import java.net.Proxy;
 import java.net.URL;
 import java.util.Hashtable;
 
+import com.duowan.util.LogCat;
+
 class DefaultHttpConnector implements IHttpConnector {
 	private HttpURLConnection httpConn;
 	private boolean isCmwap;
@@ -46,7 +48,9 @@ class DefaultHttpConnector implements IHttpConnector {
 		Logger.debug("responseCode", "getContentLength responseCode-->" + responseCode);
 		if ((responseCode == 200) || (responseCode == 206)) {
 			contentLength = this.httpConn.getContentLength();
+			LogCat.d("getContentLength  enter is " + System.currentTimeMillis());
 			this.httpConn.disconnect();
+			LogCat.d("getContentLength  out  is " + System.currentTimeMillis());
 		}
 		return contentLength;
 	}

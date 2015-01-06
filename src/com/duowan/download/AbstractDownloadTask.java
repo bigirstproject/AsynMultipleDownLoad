@@ -1,5 +1,7 @@
 package com.duowan.download;
 
+import com.duowan.util.LogCat;
+
 abstract class AbstractDownloadTask extends Thread {
 	protected IHttpConnector httpConnector;
 	protected DownloadFile downloadFile;
@@ -47,20 +49,22 @@ abstract class AbstractDownloadTask extends Thread {
 	public void stopDownload() {
 		this.stop = true;
 		try {
+			LogCat.d("stopDownload  enter is " + System.currentTimeMillis());
 			this.httpConnector.close();
+			LogCat.d("stopDownload  out  is " + System.currentTimeMillis());
 		} catch (Exception localException) {
 		}
 	}
 
 	protected void clearFaileCounter() {
-		this.downloader.resetTryNum();
+		// this.downloader.resetTryNum();
 	}
 
 	protected void addFaileCounter() {
 		if (Logger.isDebug()) {
 			Logger.debug(getName(), "------жиЪд--------");
 		}
-		this.downloader.addTryNum();
+		// this.downloader.addTryNum();
 	}
 
 	protected void stopByNetError() {

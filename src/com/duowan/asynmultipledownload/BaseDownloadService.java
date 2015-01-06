@@ -9,6 +9,7 @@ import android.os.IBinder;
 import android.os.Message;
 
 import com.duowan.download.DownloadFile;
+import com.duowan.download.FileDownloader;
 import com.duowan.download.IConfig;
 import com.duowan.download.IOperator;
 import com.duowan.download.IProgressListener;
@@ -54,7 +55,7 @@ public abstract class BaseDownloadService extends BaseService {
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		LogCat.d("onDestroy() = "+getmCallbacks().size());
+		LogCat.d("onDestroy() = " + getmCallbacks().size());
 		mDownloadManager.stopAll();
 	}
 
@@ -87,8 +88,16 @@ public abstract class BaseDownloadService extends BaseService {
 			switch (msg.what) {
 			case DOWNLOADING_STATE:
 				if (msg != null && msg.obj instanceof DownloadFile) {
+					if(msg.arg1 == FileDownloader.INTERUPT){
+						
+					}
 					DownloadFile file = (DownloadFile) msg.obj;
 					invokeCallback(file, msg.arg1);
+					if (!(msg.arg1 == FileDownloader.PREPAREING
+							|| msg.arg1 == FileDownloader.READY
+							|| msg.arg1 == FileDownloader.DOWNLOADING)) {
+						mDownloadManager.downNextWaittingQueueWrapper();
+					}
 				}
 			default:
 				break;
@@ -135,23 +144,13 @@ public abstract class BaseDownloadService extends BaseService {
 		}
 
 		@Override
-		public boolean addToWaittingQueue(ParamsWrapper paramsWrapper) {
-			return mDownloadManager.addToWaittingQueue(paramsWrapper);
-		}
-
-		@Override
 		public void stopDownload(String key) {
 			mDownloadManager.stopDownload(key);
 		}
-		
+
 		@Override
 		public void stopAllDownload() {
 			mDownloadManager.stopAll();
-		}
-
-		@Override
-		public void removeFromWaittingQueue(String key) {
-			mDownloadManager.removeFromWaittingQueue(key);
 		}
 
 		@Override
@@ -162,11 +161,6 @@ public abstract class BaseDownloadService extends BaseService {
 		@Override
 		public boolean isDownloading(String key) {
 			return mDownloadManager.isDownloading(key);
-		}
-
-		@Override
-		public boolean isInWaittingQueue(String key) {
-			return mDownloadManager.isInWaittingQueue(key);
 		}
 
 		@Override

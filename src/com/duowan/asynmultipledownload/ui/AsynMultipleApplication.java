@@ -7,7 +7,7 @@ public class AsynMultipleApplication extends BaseApplication {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		DownLoadUrl.createBaseFilePath(DownLoadUrl.ROOT_BASE_PATH);
+		UrlWrapper.createBaseFilePath(UrlWrapper.ROOT_BASE_PATH);
 		AppControler.getInstance().init();
 	}
 

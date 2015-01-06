@@ -9,10 +9,13 @@ public class DownLoadParcel implements Serializable {
 	private static final long serialVersionUID = -3332115500142060372L;
 
 	public static final int START = 0;
-	public static final int DOWNING = 1;
-	public static final int CONTINUE = 4;
-	public static final int INTERRUPT =3;
-	public static final int COMPLETE  = 5;
+	public static final int PREPAREING = 1;// 准备中
+	public static final int READY = 2;// 等待中
+	public static final int DOWNING = 3;// 下载中
+	public static final int INTERRUPT =4;// 中断
+	public static final int CONTINUE = 7;// 继续
+	public static final int FINISH  = 5;// 完成（成功）
+	public static final int INTERUPTING  = 6;// 暂停中
 	
 	private int id;
 	private String url;

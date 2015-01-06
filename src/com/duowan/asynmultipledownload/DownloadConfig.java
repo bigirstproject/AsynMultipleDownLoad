@@ -101,4 +101,9 @@ public class DownloadConfig extends DefaultConfig {
 		return false;
 	}
 
+	@Override
+	public int maxLoadingNums() {
+		return 2;
+	}
+
 }

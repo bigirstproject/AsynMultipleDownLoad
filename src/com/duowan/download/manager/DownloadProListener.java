@@ -5,6 +5,8 @@ import android.os.Message;
 import com.duowan.asynmultipledownload.BaseDownloadService.MyHandle;
 import com.duowan.download.DefaultProgressListener;
 import com.duowan.download.DownloadFile;
+import com.duowan.download.FileDownloader;
+import com.duowan.util.LogCat;
 
 public class DownloadProListener extends DefaultProgressListener {
 
@@ -22,6 +24,9 @@ public class DownloadProListener extends DefaultProgressListener {
 		msg.arg1 = state;
 		msg.obj = file;
 		msg.what = DOWNLOADING_STATE;
+		if(state == FileDownloader.INTERUPT){
+			LogCat.d("onProgressChanged file state is "+System.currentTimeMillis());
+		}
 		sendMessage(msg);
 	}
 
