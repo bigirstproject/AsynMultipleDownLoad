@@ -1,6 +1,7 @@
 package com.duowan.asynmultipledownload.ui;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
 
 import android.content.Context;
 import android.os.Handler;
@@ -17,6 +18,9 @@ import android.widget.TextView;
 
 import com.duowan.asynmultipledownload.DownloadServiceUtil;
 import com.duowan.asynmultipledownload.R;
+import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
+import com.duowan.download.FileDownloader;
+import com.duowan.download.manager.DownloadManager;
 import com.duowan.util.LogCat;
 import com.duowan.util.ToastShowUtil;
 
@@ -122,7 +126,38 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 
 	public void registerCallback() {
 		listener = new AppDownloadProListener(myHandler);
-		DownloadServiceUtil.registerCallback(listener);
+		DownloadServiceUtil.registerCallback(listener,
+				new IDownloadManagerCallBackListener() {
+
+					@Override
+					public void setCallBackDownloadManagerLitener(
+							DownloadManager downloadManager) {
+						// HashMap<String, FileDownloader> downloadingSet =
+						// downloadManager
+						// .getDownloadingSet();
+						LinkedList<FileDownloader> waittingList = downloadManager
+								.getWaittingList();
+
+						for (int i = 0; i < mList.size(); i++) {
+							DownLoadParcel downLoadParcel = mList.get(i);
+							for (int j = 0; j < waittingList.size(); j++) {
+								if (waittingList.get(j).getDownloadFile()
+										.getResUrl()
+										.equals(downLoadParcel.getUrl())) {
+									long haveRead = waittingList.get(j)
+											.getDownloadFile().getHaveRead();
+									long fileSize = waittingList.get(j)
+											.getDownloadFile().getFileSize();
+									int downloadPer = (int) ((haveRead * 100) / fileSize);
+									downLoadParcel.setProgress(downloadPer);
+									downLoadParcel
+											.setDownStatus(DownLoadParcel.READY);
+								}
+							}
+						}
+						notifyDataInvalidated();
+					}
+				});
 	}
 
 	public void removeCallback() {
@@ -148,7 +183,8 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						item.setDownStatus(DownLoadParcel.READY);
 						DownloadServiceUtil.download(item.getUrl(),
 								item.getFilePath(), null);
-					} else if (item.getDownStatus() == DownLoadParcel.DOWNING) {
+					} else if (item.getDownStatus() == DownLoadParcel.DOWNING
+							|| item.getDownStatus() == DownLoadParcel.READY) {
 						item.setDownStatus(DownLoadParcel.INTERUPTING);
 						DownloadServiceUtil.stopDownload(item.getUrl());
 					} else if (item.getDownStatus() == DownLoadParcel.CONTINUE
@@ -201,8 +237,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {
 							downLoadParcel.setProgress(100);
-							downLoadParcel
-									.setDownStatus(DownLoadParcel.FINISH);
+							downLoadParcel.setDownStatus(DownLoadParcel.FINISH);
 							notifyDataInvalidated();
 							break;
 						}

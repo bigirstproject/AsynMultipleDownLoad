@@ -48,7 +48,7 @@ public class MainActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		mBaseAdapter.registerCallback();
+		
 	}
 
 	@Override
@@ -109,6 +109,7 @@ public class MainActivity extends Activity {
 			if (result) {
 				mBaseAdapter.notifyDataSetChanged();
 			}
+			mBaseAdapter.registerCallback();
 		}
 	}
 

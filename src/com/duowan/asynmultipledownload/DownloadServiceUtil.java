@@ -50,7 +50,7 @@ public class DownloadServiceUtil {
 							&& component.getDownloadManager() != null) {
 						sService.registerCallback(component.getListener(),
 								component.getDownloadManager());
-					} else if (component.getListener() != null){
+					} else if (component.getListener() != null) {
 						sService.registerCallback(component.getListener());
 					}
 				}
@@ -196,7 +196,9 @@ public class DownloadServiceUtil {
 			sService.removeCallback(listener);
 		} else {
 			synchronized (mCallbacks) {
-				mCallbacks.remove(listener);
+				BindBeforeComponent component = new BindBeforeComponent();
+				component.setListener(listener);
+				mCallbacks.remove(component);
 			}
 		}
 	}
