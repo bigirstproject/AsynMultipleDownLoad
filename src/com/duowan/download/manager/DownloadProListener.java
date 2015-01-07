@@ -2,19 +2,19 @@ package com.duowan.download.manager;
 
 import android.os.Message;
 
-import com.duowan.asynmultipledownload.BaseDownloadService.MyHandle;
+import com.duowan.asynmultipledownload.service.BaseWorkerService.BackgroundHandler;
 import com.duowan.download.DefaultProgressListener;
 import com.duowan.download.DownloadFile;
-import com.duowan.download.FileDownloader;
 import com.duowan.util.LogCat;
 
 public class DownloadProListener extends DefaultProgressListener {
 
-	private final int DOWNLOADING_STATE = 0x10001;
-	protected MyHandle mHandle;
+	private final int DOWNLOADING_PROGRESS_STATE = 0x10001;
+	private final int DOWNLOADING_ERROR_STATE = 0x10002;
+	private BackgroundHandler mBackgroundHandler;
 
-	public DownloadProListener(MyHandle handle) {
-		this.mHandle = handle;
+	public DownloadProListener(BackgroundHandler backgroundHandler) {
+		this.mBackgroundHandler = backgroundHandler;
 	}
 
 	@Override
@@ -23,10 +23,7 @@ public class DownloadProListener extends DefaultProgressListener {
 		Message msg = new Message();
 		msg.arg1 = state;
 		msg.obj = file;
-		msg.what = DOWNLOADING_STATE;
-		if(state == FileDownloader.INTERUPT){
-			LogCat.d("onProgressChanged file state is "+System.currentTimeMillis());
-		}
+		msg.what = DOWNLOADING_PROGRESS_STATE;
 		sendMessage(msg);
 	}
 
@@ -36,11 +33,14 @@ public class DownloadProListener extends DefaultProgressListener {
 		Message msg = new Message();
 		msg.arg1 = errorType;
 		msg.obj = file;
-		msg.what = DOWNLOADING_STATE;
+		msg.what = DOWNLOADING_ERROR_STATE;
 		sendMessage(msg);
 	}
 
-	protected void sendMessage(Message msg) {
-		mHandle.sendMessage(msg);
+	private void sendMessage(Message msg) {
+		LogCat.d("mBackgroundHandler =  " +( mBackgroundHandler == null) + "    time  is " + System.currentTimeMillis());
+		if (mBackgroundHandler != null) {
+			mBackgroundHandler.sendMessage(msg);
+		}
 	}
 }

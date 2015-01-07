@@ -1,4 +1,4 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.util;
 
 import android.content.Context;
 import android.net.ConnectivityManager;

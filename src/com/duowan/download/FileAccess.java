@@ -56,6 +56,8 @@ class FileAccess {
 	public long saveFile(InputStream input, long seekTo,
 			FileSaveProgressListener listener) {
 		RandomAccessFile randomAccessFile = null;
+		LogCat.d("saveFile is  start  "
+				+ "     time is  " + System.currentTimeMillis());
 		try {
 			randomAccessFile = new RandomAccessFile(
 					this.downloadFile.getFilePath(), "rw");
@@ -73,7 +75,8 @@ class FileAccess {
 			int read = 0;
 			byte[] buffer = new byte[this.bufferSize];
 			long haveRead = 0L;
-			LogCat.d("saveFile start : stop is "+stop);
+			LogCat.d("saveFile is  downing  "
+					+ "     time is  " + System.currentTimeMillis());
 			while ((!this.stop)&&(read = bis.read(buffer)) != -1) {
 				haveRead += read;
 				saveFile(buffer, 0, read, randomAccessFile, listener);
@@ -82,7 +85,7 @@ class FileAccess {
 					return -1L;
 				}
 			}
-			LogCat.d("saveFile onDestroy() : stop is "+stop);
+			LogCat.d("saveFile  is  success "+ " :    time is  " + System.currentTimeMillis());
 			return haveRead;
 		} catch (Exception e) {
 			return -1L;

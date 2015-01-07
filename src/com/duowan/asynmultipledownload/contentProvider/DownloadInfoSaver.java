@@ -1,8 +1,9 @@
 
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.contentProvider;
 
 import java.util.List;
 
+import com.duowan.asynmultipledownload.operator.DownloadOperator;
 import com.duowan.download.DefaultOperator;
 import com.duowan.download.DownloadFile;
 

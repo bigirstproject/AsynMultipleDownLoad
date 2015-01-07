@@ -1,4 +1,4 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.operator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,8 +9,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.duowan.asynmultipledownload.bean.DownloadTable;
 import com.duowan.asynmultipledownload.ui.BaseApplication;
 import com.duowan.download.DownloadFile;
+import com.duowan.util.LogCat;
 
 /**
  * 下载表操作类
@@ -32,6 +34,7 @@ public class DownloadOperator extends BaseDbOperator<DownloadFile> {
 			}
 			mDownloadOperator = new DownloadOperator(context);
 		}
+		LogCat.d("create  database  object : time  = " + System.currentTimeMillis());
 		return mDownloadOperator;
 	}
 

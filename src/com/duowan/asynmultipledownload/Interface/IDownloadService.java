@@ -1,9 +1,8 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.Interface;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;
 import com.duowan.download.IProgressListener;
@@ -35,12 +34,17 @@ public interface IDownloadService {
 	int getProgress(String key);
 
 	void registerCallback(IProgressListener listener);
-	
-	void registerCallback(IProgressListener listener,IDownloadManagerCallBackListener downloadManager);
+
+	void registerCallback(IProgressListener listener,
+			IDownloadManagerCallBackListener downloadManager);
 
 	void removeCallback(IProgressListener listener);
 
 	HashMap<String, FileDownloader> getDownloadingSet();
-	
+
 	LinkedList<FileDownloader> getWaittingList();
+
+	void registerDowningCallback(
+			IDownloadManagerCallBackListener callBackListener);
+
 }

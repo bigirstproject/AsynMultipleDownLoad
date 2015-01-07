@@ -57,14 +57,14 @@ abstract class AbstractDownloadTask extends Thread {
 	}
 
 	protected void clearFaileCounter() {
-		// this.downloader.resetTryNum();
+		 this.downloader.resetTryNum();
 	}
 
 	protected void addFaileCounter() {
 		if (Logger.isDebug()) {
 			Logger.debug(getName(), "------жиЪд--------");
 		}
-		// this.downloader.addTryNum();
+		 this.downloader.addTryNum();
 	}
 
 	protected void stopByNetError() {

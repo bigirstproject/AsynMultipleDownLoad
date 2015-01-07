@@ -1,4 +1,4 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.operator;
 
 import java.util.List;
 

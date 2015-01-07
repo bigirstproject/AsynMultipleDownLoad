@@ -1,6 +1,6 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.downTools;
 
-import com.duowan.asynmultipledownload.DownloadServiceUtil.DownloadServiceToken;
+import com.duowan.asynmultipledownload.downTools.DownloadServiceUtil.DownloadServiceToken;
 import com.duowan.asynmultipledownload.ui.AsynMultipleApplication;
 
 /**

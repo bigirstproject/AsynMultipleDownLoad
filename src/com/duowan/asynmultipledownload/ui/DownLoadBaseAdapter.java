@@ -16,9 +16,9 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.TextView;
 
-import com.duowan.asynmultipledownload.DownloadServiceUtil;
 import com.duowan.asynmultipledownload.R;
 import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
+import com.duowan.asynmultipledownload.downTools.DownloadServiceUtil;
 import com.duowan.download.FileDownloader;
 import com.duowan.download.manager.DownloadManager;
 import com.duowan.util.LogCat;
@@ -30,13 +30,13 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 	private Context mContext;
 	private LayoutInflater mInflater;
 	private ArrayList<DownLoadParcel> mList;
-	private MyHandle myHandler;
+	private ProgressHandle myHandler;
 	private AppDownloadProListener listener;
 
 	public DownLoadBaseAdapter(Context context) {
 		this.mContext = context;
 		mInflater = LayoutInflater.from(context);
-		myHandler = new MyHandle(mContext);
+		myHandler = new ProgressHandle(mContext);
 	}
 
 	public void setData(ArrayList<DownLoadParcel> list) {
@@ -208,7 +208,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 
 	}
 
-	public class MyHandle extends Handler {
+	public class ProgressHandle extends Handler {
 
 		private Context mContext;
 
@@ -220,7 +220,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 
 		private final int UPDATE_DOWNLOAD_PROGRESS = 0x10004;
 
-		public MyHandle(Context context) {
+		public ProgressHandle(Context context) {
 			this.mContext = context;
 		}
 
@@ -287,7 +287,7 @@ public class DownLoadBaseAdapter extends BaseAdapter {
 				// 更新进度
 				if (msg != null && msg.arg1 >= 0 && msg.obj instanceof String) {
 					String resUrl = (String) msg.obj;
-					Log.d("test", resUrl + " = " + msg.arg1);
+//					Log.d("test", resUrl + " = " + msg.arg1);
 					for (int i = 0; i < mList.size(); i++) {
 						DownLoadParcel downLoadParcel = mList.get(i);
 						if (resUrl.equals(downLoadParcel.getUrl())) {

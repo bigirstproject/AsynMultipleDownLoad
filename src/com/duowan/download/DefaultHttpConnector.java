@@ -45,21 +45,23 @@ class DefaultHttpConnector implements IHttpConnector {
 		this.httpConn = create(resUrl);
 		int contentLength = -1;
 		int responseCode = this.httpConn.getResponseCode();
-		Logger.debug("responseCode", "getContentLength responseCode-->" + responseCode);
+		Logger.debug("responseCode", "getContentLength responseCode-->"
+				+ responseCode);
 		if ((responseCode == 200) || (responseCode == 206)) {
 			contentLength = this.httpConn.getContentLength();
-			LogCat.d("getContentLength  enter is " + System.currentTimeMillis());
 			close();
-			LogCat.d("getContentLength  out  is " + System.currentTimeMillis());
 		}
 		return contentLength;
 	}
 
 	public void close() throws Exception {
-		new Thread(){
+		new Thread() {
 			public void run() {
-				httpConn.disconnect();
-				LogCat.d("httpConn  is  close " + System.currentTimeMillis());
+				if (httpConn != null) {
+					httpConn.disconnect();
+					LogCat.d("httpConn  is  close "
+							+ System.currentTimeMillis());
+				}
 			};
 		}.start();
 	}
@@ -67,6 +69,8 @@ class DefaultHttpConnector implements IHttpConnector {
 	private HttpURLConnection create(String resUrl) throws Exception {
 		URL url = new URL(resUrl);
 		HttpURLConnection httpConn;
+		LogCat.d("HttpURLConnection  in  is time = "
+				+ System.currentTimeMillis());
 		if (this.isCmwap) {
 			Proxy proxy = new Proxy(Proxy.Type.HTTP, new InetSocketAddress(
 					"10.0.0.172", 80));
@@ -90,6 +94,8 @@ class DefaultHttpConnector implements IHttpConnector {
 						(String) requestHeaders.get(key));
 			}
 		}
+		LogCat.d("HttpURLConnection  out  is time = "
+				+ System.currentTimeMillis());
 		return httpConn;
 	}
 
@@ -97,7 +103,8 @@ class DefaultHttpConnector implements IHttpConnector {
 			throws Exception {
 		if (httpConn != null) {
 			int responseCode = httpConn.getResponseCode();
-			Logger.debug("responseCode", "handleResponse responseCode -->" + responseCode);
+			Logger.debug("responseCode", "handleResponse responseCode -->"
+					+ responseCode);
 			InputStream inputStream = httpConn.getInputStream();
 			long contentLength = httpConn.getContentLength();
 			String contentType = httpConn.getContentType();

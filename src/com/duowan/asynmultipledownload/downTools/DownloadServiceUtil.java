@@ -1,4 +1,4 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.downTools;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,7 +13,9 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 
 import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
+import com.duowan.asynmultipledownload.Interface.IDownloadService;
 import com.duowan.asynmultipledownload.bean.BindBeforeComponent;
+import com.duowan.asynmultipledownload.service.DownloadService;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;
 import com.duowan.download.IProgressListener;
@@ -30,6 +32,8 @@ public class DownloadServiceUtil {
 	private static HashMap<Context, ServiceBinder> sConnectionMap = new HashMap<Context, ServiceBinder>();
 
 	protected static ArrayList<BindBeforeComponent> mCallbacks = new ArrayList<BindBeforeComponent>();
+
+	protected static ArrayList<IDownloadManagerCallBackListener> mDowningCallbacks = new ArrayList<IDownloadManagerCallBackListener>();
 
 	public static class DownloadServiceToken {
 		ContextWrapper mWrappedContext;
@@ -56,11 +60,30 @@ public class DownloadServiceUtil {
 				}
 				mCallbacks = null;
 			}
+
+			if (mDowningCallbacks != null && mDowningCallbacks.size() > 0) {
+				for (int i = 0; i < mDowningCallbacks.size(); i++) {
+					IDownloadManagerCallBackListener callBackListener = mDowningCallbacks
+							.remove(i);
+					if (callBackListener != null) {
+						sService.registerDowningCallback(callBackListener);
+					}
+				}
+				mDowningCallbacks = null;
+			}
 		}
 
 		public void onServiceDisconnected(ComponentName className) {
-			sService = null;
+			StopBindService();
 		}
+
+	}
+
+	public static void StopBindService() {
+		sService = null;
+		sConnectionMap.clear();
+		mCallbacks.clear();
+		mDowningCallbacks.clear();
 	}
 
 	public static DownloadServiceToken bindToService(Context context) {
@@ -199,6 +222,19 @@ public class DownloadServiceUtil {
 				BindBeforeComponent component = new BindBeforeComponent();
 				component.setListener(listener);
 				mCallbacks.remove(component);
+			}
+		}
+	}
+
+	public static void registerDowningCallback(
+			IDownloadManagerCallBackListener callBackListener) {
+		if (checkServiceBinded()) {
+			sService.registerDowningCallback(callBackListener);
+		} else {
+			synchronized (mDowningCallbacks) {
+				if (!mDowningCallbacks.contains(callBackListener)) {
+					mDowningCallbacks.add(callBackListener);
+				}
 			}
 		}
 	}

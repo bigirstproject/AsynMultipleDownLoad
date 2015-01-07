@@ -1,9 +1,8 @@
 package com.duowan.asynmultipledownload.ui;
 
-import android.content.Context;
 import android.os.Message;
 
-import com.duowan.asynmultipledownload.ui.DownLoadBaseAdapter.MyHandle;
+import com.duowan.asynmultipledownload.ui.DownLoadBaseAdapter.ProgressHandle;
 import com.duowan.download.DefaultProgressListener;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;
@@ -13,8 +12,6 @@ public class AppDownloadProListener extends DefaultProgressListener {
 	private long haveRead = 0;
 
 	private long fileSize = 1;
-
-	private Context mContext = null;
 
 	private final int UN_CHECKED = 1;
 
@@ -34,9 +31,9 @@ public class AppDownloadProListener extends DefaultProgressListener {
 	
 	private final int UPDATE_DOWNLOAD_PROGRESS = 0x10004;
 
-	private MyHandle mHandle = null;
+	private ProgressHandle mHandle = null;
 
-	public AppDownloadProListener(MyHandle handle) {
+	public AppDownloadProListener(ProgressHandle handle) {
 		this.mHandle = handle;
 	}
 

@@ -1,5 +1,5 @@
 
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.contentProvider;
 
 import android.annotation.SuppressLint;
 import android.content.ContentProvider;

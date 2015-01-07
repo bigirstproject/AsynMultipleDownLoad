@@ -1,5 +1,5 @@
 
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.bean;
 
 import android.provider.BaseColumns;
 

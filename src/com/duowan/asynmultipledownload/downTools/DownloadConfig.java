@@ -1,13 +1,14 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.downTools;
 
 import java.util.Hashtable;
 
 import android.content.Context;
 
-import com.duowan.asynmultipledownload.NetWorkUtil.NetworkType;
 import com.duowan.asynmultipledownload.ui.BaseApplication;
 import com.duowan.download.DefaultConfig;
 import com.duowan.download.NetType;
+import com.duowan.util.NetWorkUtil;
+import com.duowan.util.NetWorkUtil.NetworkType;
 
 /**
  * œ¬‘ÿ≈‰÷√

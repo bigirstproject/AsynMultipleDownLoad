@@ -51,7 +51,7 @@ public class FileDownloader {
 
 	public FileDownloader(String resUrl, String filePath, String fileName,
 			long fileSize, String key) {
-		this.tryMaxNum = 3;
+		this.tryMaxNum = 1;
 
 		this.fileSize = -1L;
 
@@ -156,11 +156,13 @@ public class FileDownloader {
 		this.filePath = this.downloadFile.getFilePath();
 
 		if (this.fileSize <= 0L) {
+			LogCat.d("getContentLength  in is  time = " + System.currentTimeMillis());
 			this.fileSize = getContentLength(this.resUrl);
 			Logger.debug("fileSize", "getFileSize=" + this.fileSize);
 			if (this.fileSize > 0L) {
 				this.downloadFile.setFileSize(this.fileSize);
 			}
+			LogCat.d("getContentLength  out  is time = " + System.currentTimeMillis());
 		}
 
 		File file = new File(this.filePath);
@@ -172,14 +174,15 @@ public class FileDownloader {
 		} else {
 			this.downloadFile.setHaveRead(0L);
 			this.downloadFile.setState(0);
+			LogCat.d("createFile  in  is time = " + System.currentTimeMillis());
 			boolean createFile = createFile(this.downloadFile);
+			LogCat.d("createFile  out  is time = " + System.currentTimeMillis());
 			if (!(createFile)) {
 				this.progressListener.onError(this.downloadFile, 10);
 				return;
 			}
-
 		}
-
+		LogCat.d("startTask  loading  is A : time  = " + System.currentTimeMillis());
 		boolean isRange = this.configWrapper.isRange();
 
 		boolean isBlock = this.configWrapper.isBlock();
@@ -209,8 +212,12 @@ public class FileDownloader {
 		} else {
 			this.downloadFile.setHaveRead(0L);
 		}
+		LogCat.d("startTask  loading  is B : time  = " + System.currentTimeMillis());
+		
 		this.operator.updateFile(this.downloadFile);
-
+		
+		LogCat.d("updateFile  dabase £º time  = " + System.currentTimeMillis());
+		
 		Statistics statis = this.downloadFile.getStatis();
 
 		statis.setStartTime(System.currentTimeMillis());
@@ -227,6 +234,7 @@ public class FileDownloader {
 		}
 		Logger.debug("test", "isRange = " + isRange + "     isBlock = "
 				+ isBlock + "   taskNum = " + taskNum);
+		LogCat.d("startTask  loading  is C : time  = " + System.currentTimeMillis());
 		startDownloadTasks(taskNum);
 	}
 
@@ -248,14 +256,13 @@ public class FileDownloader {
 		else {
 			return;
 		}
-
-		this.fileAccess.setStop(true);
 		int size = this.tasks.size();
 		LogCat.d("stopDownload size is " + size + "   "
 				+ System.currentTimeMillis());
 		for (int i = 0; i < size; ++i) {
 			((AbstractDownloadTask) this.tasks.get(i)).stopDownload();
 		}
+		this.fileAccess.setStop(true);
 		LogCat.d("stopDownload file state is B " + System.currentTimeMillis());
 		Logger.debug("stop", "---------" + this.fileName
 				+ " stopDownload----------");
@@ -265,8 +272,6 @@ public class FileDownloader {
 
 		this.operator.updateFile(this.downloadFile);
 		if (stopReason == 4) {
-			LogCat.d("stopDownload file state is C "
-					+ System.currentTimeMillis());
 			this.progressListener.onProgressChanged(this.downloadFile, 4);
 		} else if (stopReason == 12) {
 			this.progressListener.onError(this.downloadFile, 12);
@@ -284,6 +289,8 @@ public class FileDownloader {
 
 	synchronized void addTryNum() {
 		this.tryNum += 1;
+		LogCat.d("tryNum = "+tryNum
+				+ "  :   tryMaxNum =  " +tryMaxNum +"  :  time  = "+ System.currentTimeMillis());
 		if (this.tryNum >= this.tryMaxNum)
 			stopByTimeOut();
 	}
@@ -302,13 +309,20 @@ public class FileDownloader {
 			long fileSize = downloadFile.getFileSize();
 			File file = new File(filePath);
 			File parent = file.getParentFile();
+			LogCat.d("createFile parent  in : time = " + System.currentTimeMillis());
 			if (!(parent.exists())) {
 				parent.mkdirs();
 			}
+			LogCat.d("createFile parent  out : time = " + System.currentTimeMillis());
+			
 			if (fileSize > 0L) {
+				LogCat.d("createFile RandomAccessFile  in : time = " + System.currentTimeMillis());
 				RandomAccessFile raf = new RandomAccessFile(filePath, "rw");
+				LogCat.d("fileSize = "+fileSize +"   createFile RandomAccessFile  length  in: time = " + System.currentTimeMillis());
 				raf.setLength(fileSize);
+				LogCat.d("createFile RandomAccessFile  close  in: time = " + System.currentTimeMillis());
 				raf.close();
+				LogCat.d("createFile RandomAccessFile  out : time = " + System.currentTimeMillis());
 			}
 			return true;
 		} catch (Exception e) {
@@ -323,7 +337,7 @@ public class FileDownloader {
 		this.downloadFile.setState(3);
 		this.operator.updateFile(this.downloadFile);
 		this.progressListener.onProgressChanged(this.downloadFile, 3);
-
+		LogCat.d("startTask  loading  is D : time  = " + System.currentTimeMillis());
 		for (int i = 0; (i < taskNum) && (!(isStop())); ++i)
 			startDownloadTask();
 	}
@@ -333,10 +347,12 @@ public class FileDownloader {
 		boolean isBlock = this.configWrapper.isBlock();
 		if (!(isStop())) {
 			AbstractDownloadTask task = createDownloadTask(isRange, isBlock);
-
 			this.tasks.add(task);
 
+			LogCat.d("startTask  loading  is E : time  = " + System.currentTimeMillis());
+			
 			task.start();
+			LogCat.d("AbstractDownloadTask  is start £º time  = " + System.currentTimeMillis());
 		}
 	}
 
@@ -424,6 +440,7 @@ public class FileDownloader {
 				e.printStackTrace();
 			}
 		}
+		
 		return contentLength;
 	}
 

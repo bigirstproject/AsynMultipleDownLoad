@@ -77,8 +77,8 @@ public class DownloadManager {
 	}
 
 	public boolean downNextWaittingQueueWrapper() {
-		LogCat.d("downNextWaittingQueueWrapper  mWaittingList.size() is "
-				+ mWaittingList.size());
+		LogCat.d("\n waittingList size = " + mWaittingList.size()
+				+ "    time  is " + System.currentTimeMillis());
 		synchronized (this.mWaittingList) {
 			if (mWaittingList != null && mWaittingList.size() > 0
 					&& mConfig != null
@@ -263,6 +263,9 @@ public class DownloadManager {
 		}
 
 		public void run() {
+			LogCat.d("DownloadThread is start : url = "
+					+ mDownloader.getDownloadFile().getResUrl()
+					+ "          time is  " + System.currentTimeMillis());
 			this.mDownloader.startTask();
 		}
 	}

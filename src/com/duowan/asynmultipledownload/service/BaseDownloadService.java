@@ -1,4 +1,4 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -6,11 +6,11 @@ import java.util.LinkedList;
 
 import android.content.Intent;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
 
 import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
+import com.duowan.asynmultipledownload.Interface.IDownloadService;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;
 import com.duowan.download.IConfig;
@@ -21,21 +21,26 @@ import com.duowan.download.manager.DownloadProListener;
 import com.duowan.download.manager.ParamsWrapper;
 import com.duowan.util.LogCat;
 
+
+
 /**
  * 下载服务
  * 
  */
-public abstract class BaseDownloadService extends BaseService {
+public abstract class BaseDownloadService extends BaseWorkerService {
 
-	protected MyHandle mHandle;
+	private static final int DOWNLOADING_PROGRESS_STATE = 0x10001;
+	private static final int DOWNLOADING_ERROR_STATE = 0x10002;
+	protected static final int PRORESS_CODE = 1;
+	protected static final int ERROR_CODE = 2;
 	protected ArrayList<IProgressListener> mCallbacks;
 	protected DownloadManager mDownloadManager;
 
 	public void onCreate() {
-		mHandle = new MyHandle();
+		super.onCreate();
 		mCallbacks = new ArrayList<IProgressListener>();
 		mDownloadManager = new DownloadManager(createOperator(),
-				KGLog.isDebug());
+				LogCat.isDebug());
 		IConfig config = createConfig();
 		if (config != null) {
 			mDownloadManager.setConfig(config);
@@ -47,18 +52,15 @@ public abstract class BaseDownloadService extends BaseService {
 		return mBinder;
 	}
 
-	public DownloadManager getmDownloadManager() {
-		return mDownloadManager;
-	}
-
-	public ArrayList<IProgressListener> getmCallbacks() {
+	protected ArrayList<IProgressListener> getmCallbacks() {
 		return mCallbacks;
 	}
 
 	@Override
 	public void onDestroy() {
 		super.onDestroy();
-		LogCat.d("onDestroy() = " + getmCallbacks().size());
+		LogCat.d("BaseDownloadService is  onDestroy() : Callbacks size is"
+				+ mCallbacks.size());
 		mDownloadManager.stopAll();
 	}
 
@@ -80,34 +82,40 @@ public abstract class BaseDownloadService extends BaseService {
 	 * 遍历注册的监听器
 	 * 
 	 */
-	protected abstract void invokeCallback(DownloadFile file, int state);
+	protected abstract void invokeCallback(DownloadFile file, int state,
+			int type);
 
-	public class MyHandle extends Handler {
-
-		private final int DOWNLOADING_STATE = 0x10001;
-
-		@Override
-		public void handleMessage(Message msg) {
-			switch (msg.what) {
-			case DOWNLOADING_STATE:
-				if (msg != null && msg.obj instanceof DownloadFile) {
-					DownloadFile file = (DownloadFile) msg.obj;
-					invokeCallback(file, msg.arg1);
-					if (!(msg.arg1 == FileDownloader.PREPAREING
-							|| msg.arg1 == FileDownloader.READY
-							|| msg.arg1 == FileDownloader.DOWNLOADING)) {
-						mDownloadManager.downNextWaittingQueueWrapper();
-					}
+	@Override
+	protected void handleBackgroundMessage(Message msg) {
+		super.handleBackgroundMessage(msg);
+		switch (msg.what) {
+		case DOWNLOADING_PROGRESS_STATE:
+			if (msg != null && msg.obj instanceof DownloadFile) {
+				DownloadFile file = (DownloadFile) msg.obj;
+				invokeCallback(file, msg.arg1, PRORESS_CODE);
+				if (!(msg.arg1 == FileDownloader.PREPAREING
+						|| msg.arg1 == FileDownloader.READY || msg.arg1 == FileDownloader.DOWNLOADING)) {
+					mDownloadManager.downNextWaittingQueueWrapper();
 				}
-			default:
-				break;
 			}
+		case DOWNLOADING_ERROR_STATE:
+			if (msg != null && msg.obj instanceof DownloadFile) {
+				DownloadFile file = (DownloadFile) msg.obj;
+				invokeCallback(file, msg.arg1, ERROR_CODE);
+				if (!(msg.arg1 == FileDownloader.PREPAREING
+						|| msg.arg1 == FileDownloader.READY || msg.arg1 == FileDownloader.DOWNLOADING)) {
+					mDownloadManager.downNextWaittingQueueWrapper();
+				}
+			}
+		default:
+			break;
 		}
+
 	}
 
 	private IBinder mBinder = new ServiceStub();
 
-	protected class ServiceStub extends Binder implements IDownloadService {
+   class ServiceStub extends Binder implements IDownloadService {
 
 		@Override
 		public boolean download(String resUrl, String filePath,
@@ -116,7 +124,7 @@ public abstract class BaseDownloadService extends BaseService {
 				return mDownloadManager.download(resUrl, filePath, listener);
 			} else {
 				return mDownloadManager.download(resUrl, filePath,
-						new DownloadProListener(mHandle));
+						new DownloadProListener(mBackgroundHandler));
 			}
 		}
 
@@ -128,7 +136,7 @@ public abstract class BaseDownloadService extends BaseService {
 						listener);
 			} else {
 				return mDownloadManager.download(resUrl, filePath, classId,
-						new DownloadProListener(mHandle));
+						new DownloadProListener(mBackgroundHandler));
 			}
 		}
 
@@ -139,7 +147,7 @@ public abstract class BaseDownloadService extends BaseService {
 				return mDownloadManager.download(paramsWrapper, listener);
 			} else {
 				return mDownloadManager.download(paramsWrapper,
-						new DownloadProListener(mHandle));
+						new DownloadProListener(mBackgroundHandler));
 			}
 		}
 
@@ -181,7 +189,7 @@ public abstract class BaseDownloadService extends BaseService {
 				}
 			}
 		}
-		
+
 		@Override
 		public void registerCallback(IProgressListener listener,
 				IDownloadManagerCallBackListener callBackListener) {
@@ -190,7 +198,8 @@ public abstract class BaseDownloadService extends BaseService {
 					mCallbacks.add(listener);
 				}
 			}
-			callBackListener.setCallBackDownloadManagerLitener(mDownloadManager);
+			callBackListener
+					.setCallBackDownloadManagerLitener(mDownloadManager);
 		}
 
 		@Override
@@ -208,6 +217,13 @@ public abstract class BaseDownloadService extends BaseService {
 		@Override
 		public LinkedList<FileDownloader> getWaittingList() {
 			return mDownloadManager.getWaittingList();
+		}
+
+		@Override
+		public void registerDowningCallback(
+				IDownloadManagerCallBackListener callBackListener) {
+			callBackListener
+					.setCallBackDownloadManagerLitener(mDownloadManager);
 		}
 
 	}

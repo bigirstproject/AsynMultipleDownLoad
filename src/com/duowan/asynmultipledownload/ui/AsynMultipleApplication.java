@@ -1,6 +1,6 @@
 package com.duowan.asynmultipledownload.ui;
 
-import com.duowan.asynmultipledownload.AppControler;
+import com.duowan.asynmultipledownload.downTools.AppControler;
 
 public class AsynMultipleApplication extends BaseApplication {
 

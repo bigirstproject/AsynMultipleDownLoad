@@ -1,4 +1,6 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.bean;
+
+import com.duowan.asynmultipledownload.contentProvider.BaseContentProvider;
 
 import android.net.Uri;
 

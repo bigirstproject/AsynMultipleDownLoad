@@ -1,13 +1,17 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.service;
 
+import com.duowan.asynmultipledownload.contentProvider.DownloadInfoSaver;
+import com.duowan.asynmultipledownload.downTools.DownloadConfig;
 import com.duowan.download.DownloadFile;
-import com.duowan.download.FileDownloader;
 import com.duowan.download.IConfig;
 import com.duowan.download.IOperator;
 import com.duowan.download.IProgressListener;
-import com.duowan.util.LogCat;
 
 public class DownloadService extends BaseDownloadService {
+	
+	public void onCreate() {
+		super.onCreate();
+	}
 
 	@Override
 	protected IOperator createOperator() {
@@ -20,15 +24,16 @@ public class DownloadService extends BaseDownloadService {
 	}
 
 	@Override
-	protected void invokeCallback(DownloadFile file, int state) {
+	protected void invokeCallback(DownloadFile file, int state, int type) {
 		synchronized (getmCallbacks()) {
 			if (getmCallbacks() != null && getmCallbacks().size() > 0) {
 				for (int i = 0; i < getmCallbacks().size(); i++) {
 					IProgressListener listener = (IProgressListener) getmCallbacks()
 							.get(i);
-					listener.onProgressChanged(file, state);
-					if(state == FileDownloader.INTERUPT){
-						LogCat.d("invokeCallback getmCallbacks is "+getmCallbacks().size()+"  "+state+System.currentTimeMillis());
+					if (type == PRORESS_CODE) {
+						listener.onProgressChanged(file, state);
+					} else if (type == ERROR_CODE) {
+						listener.onError(file, state);
 					}
 				}
 			}

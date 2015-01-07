@@ -8,8 +8,8 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.widget.ListView;
 
-import com.duowan.asynmultipledownload.DownloadOperator;
 import com.duowan.asynmultipledownload.R;
+import com.duowan.asynmultipledownload.operator.DownloadOperator;
 import com.duowan.download.DownloadFile;
 import com.duowan.util.FileUtil;
 import com.duowan.util.LogCat;

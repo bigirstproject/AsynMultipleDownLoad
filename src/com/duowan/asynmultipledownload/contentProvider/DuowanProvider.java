@@ -1,4 +1,6 @@
-package com.duowan.asynmultipledownload;
+package com.duowan.asynmultipledownload.contentProvider;
+
+import com.duowan.asynmultipledownload.bean.DownloadTable;
 
 import android.content.ContentUris;
 import android.content.ContentValues;
