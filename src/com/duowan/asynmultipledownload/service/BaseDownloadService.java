@@ -92,21 +92,25 @@ public abstract class BaseDownloadService extends BaseWorkerService {
 		case DOWNLOADING_PROGRESS_STATE:
 			if (msg != null && msg.obj instanceof DownloadFile) {
 				DownloadFile file = (DownloadFile) msg.obj;
+				LogCat.d("DOWNLOADING_PROGRESS_STATE time  is " + System.currentTimeMillis());
 				invokeCallback(file, msg.arg1, PRORESS_CODE);
 				if (!(msg.arg1 == FileDownloader.PREPAREING
 						|| msg.arg1 == FileDownloader.READY || msg.arg1 == FileDownloader.DOWNLOADING)) {
 					mDownloadManager.downNextWaittingQueueWrapper();
 				}
 			}
+			break;
 		case DOWNLOADING_ERROR_STATE:
 			if (msg != null && msg.obj instanceof DownloadFile) {
 				DownloadFile file = (DownloadFile) msg.obj;
+				LogCat.d("DOWNLOADING_ERROR_STATE time  is " + System.currentTimeMillis());
 				invokeCallback(file, msg.arg1, ERROR_CODE);
 				if (!(msg.arg1 == FileDownloader.PREPAREING
 						|| msg.arg1 == FileDownloader.READY || msg.arg1 == FileDownloader.DOWNLOADING)) {
 					mDownloadManager.downNextWaittingQueueWrapper();
 				}
 			}
+			break;
 		default:
 			break;
 		}

@@ -30,12 +30,12 @@
         </activity>
 
         <provider
-            android:name="com.duowan.asynmultipledownload.DuowanProvider"
+            android:name="com.duowan.asynmultipledownload.contentProvider.DuowanProvider"
             android:authorities="duowandb"
             android:exported="false" />
 
         <service
-            android:name="com.duowan.asynmultipledownload.DownloadService"
+            android:name="com.duowan.asynmultipledownload.service.DownloadService"
             android:icon="@drawable/ic_launcher" >
         </service>
     </application>

@@ -5,7 +5,6 @@ import android.os.Message;
 import com.duowan.asynmultipledownload.service.BaseWorkerService.BackgroundHandler;
 import com.duowan.download.DefaultProgressListener;
 import com.duowan.download.DownloadFile;
-import com.duowan.util.LogCat;
 
 public class DownloadProListener extends DefaultProgressListener {
 
@@ -38,7 +37,6 @@ public class DownloadProListener extends DefaultProgressListener {
 	}
 
 	private void sendMessage(Message msg) {
-		LogCat.d("mBackgroundHandler =  " +( mBackgroundHandler == null) + "    time  is " + System.currentTimeMillis());
 		if (mBackgroundHandler != null) {
 			mBackgroundHandler.sendMessage(msg);
 		}
