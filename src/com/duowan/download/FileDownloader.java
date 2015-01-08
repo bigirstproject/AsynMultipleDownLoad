@@ -51,7 +51,7 @@ public class FileDownloader {
 
 	public FileDownloader(String resUrl, String filePath, String fileName,
 			long fileSize, String key) {
-		this.tryMaxNum = 1;
+		this.tryMaxNum = 3;
 
 		this.fileSize = -1L;
 
@@ -111,6 +111,7 @@ public class FileDownloader {
 		this.downloadFile.setFileName(this.fileName);
 		this.downloadFile.setMimeType(getMimeType(this.filePath));
 		this.downloadFile.setFileSize(this.fileSize);
+		this.downloadFile.setState(2);
 		this.downloadFile.setKey(this.key);
 		this.fileAccess = new FileAccess(this.downloadFile,
 				this.progressListener);

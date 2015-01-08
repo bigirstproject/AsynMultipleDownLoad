@@ -35,10 +35,7 @@ public interface IDownloadService {
 
 	void registerCallback(IProgressListener listener);
 
-	void registerCallback(IProgressListener listener,
-			IDownloadManagerCallBackListener downloadManager);
-
-	void removeCallback(IProgressListener listener);
+	void unRegisterCallback(IProgressListener listener);
 
 	HashMap<String, FileDownloader> getDownloadingSet();
 

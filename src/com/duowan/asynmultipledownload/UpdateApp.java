@@ -9,8 +9,8 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 
+import com.duowan.asynmultipledownload.application.AsynMultipleApplication;
 import com.duowan.asynmultipledownload.downTools.DownloadServiceUtil;
-import com.duowan.asynmultipledownload.ui.AsynMultipleApplication;
 import com.duowan.download.DefaultProgressListener;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;

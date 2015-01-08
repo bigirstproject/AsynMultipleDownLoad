@@ -21,18 +21,16 @@ import com.duowan.download.manager.DownloadProListener;
 import com.duowan.download.manager.ParamsWrapper;
 import com.duowan.util.LogCat;
 
-
-
 /**
  * ÏÂÔØ·þÎñ
  * 
  */
 public abstract class BaseDownloadService extends BaseWorkerService {
 
-	private static final int DOWNLOADING_PROGRESS_STATE = 0x10001;
-	private static final int DOWNLOADING_ERROR_STATE = 0x10002;
-	protected static final int PRORESS_CODE = 1;
-	protected static final int ERROR_CODE = 2;
+	private final int DOWNLOADING_PROGRESS_STATE = 0x10001;
+	private final int DOWNLOADING_ERROR_STATE = 0x10002;
+	protected final int PRORESS_CODE = 1;
+	protected final int ERROR_CODE = 2;
 	protected ArrayList<IProgressListener> mCallbacks;
 	protected DownloadManager mDownloadManager;
 
@@ -92,7 +90,8 @@ public abstract class BaseDownloadService extends BaseWorkerService {
 		case DOWNLOADING_PROGRESS_STATE:
 			if (msg != null && msg.obj instanceof DownloadFile) {
 				DownloadFile file = (DownloadFile) msg.obj;
-				LogCat.d("DOWNLOADING_PROGRESS_STATE time  is " + System.currentTimeMillis());
+				LogCat.d("DOWNLOADING_PROGRESS_STATE time  is "
+						+ System.currentTimeMillis());
 				invokeCallback(file, msg.arg1, PRORESS_CODE);
 				if (!(msg.arg1 == FileDownloader.PREPAREING
 						|| msg.arg1 == FileDownloader.READY || msg.arg1 == FileDownloader.DOWNLOADING)) {
@@ -103,7 +102,8 @@ public abstract class BaseDownloadService extends BaseWorkerService {
 		case DOWNLOADING_ERROR_STATE:
 			if (msg != null && msg.obj instanceof DownloadFile) {
 				DownloadFile file = (DownloadFile) msg.obj;
-				LogCat.d("DOWNLOADING_ERROR_STATE time  is " + System.currentTimeMillis());
+				LogCat.d("DOWNLOADING_ERROR_STATE time  is "
+						+ System.currentTimeMillis());
 				invokeCallback(file, msg.arg1, ERROR_CODE);
 				if (!(msg.arg1 == FileDownloader.PREPAREING
 						|| msg.arg1 == FileDownloader.READY || msg.arg1 == FileDownloader.DOWNLOADING)) {
@@ -119,7 +119,7 @@ public abstract class BaseDownloadService extends BaseWorkerService {
 
 	private IBinder mBinder = new ServiceStub();
 
-   class ServiceStub extends Binder implements IDownloadService {
+	class ServiceStub extends Binder implements IDownloadService {
 
 		@Override
 		public boolean download(String resUrl, String filePath,
@@ -195,19 +195,7 @@ public abstract class BaseDownloadService extends BaseWorkerService {
 		}
 
 		@Override
-		public void registerCallback(IProgressListener listener,
-				IDownloadManagerCallBackListener callBackListener) {
-			synchronized (mCallbacks) {
-				if (!mCallbacks.contains(listener)) {
-					mCallbacks.add(listener);
-				}
-			}
-			callBackListener
-					.setCallBackDownloadManagerLitener(mDownloadManager);
-		}
-
-		@Override
-		public void removeCallback(IProgressListener listener) {
+		public void unRegisterCallback(IProgressListener listener) {
 			synchronized (mCallbacks) {
 				mCallbacks.remove(listener);
 			}

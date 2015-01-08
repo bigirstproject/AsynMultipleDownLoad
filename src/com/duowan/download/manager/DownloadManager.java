@@ -263,9 +263,6 @@ public class DownloadManager {
 		}
 
 		public void run() {
-			LogCat.d("DownloadThread is start : url = "
-					+ mDownloader.getDownloadFile().getResUrl()
-					+ "          time is  " + System.currentTimeMillis());
 			this.mDownloader.startTask();
 		}
 	}

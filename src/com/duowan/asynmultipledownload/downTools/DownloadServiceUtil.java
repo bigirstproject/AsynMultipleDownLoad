@@ -14,7 +14,6 @@ import android.os.IBinder;
 
 import com.duowan.asynmultipledownload.Interface.IDownloadManagerCallBackListener;
 import com.duowan.asynmultipledownload.Interface.IDownloadService;
-import com.duowan.asynmultipledownload.bean.BindBeforeComponent;
 import com.duowan.asynmultipledownload.service.DownloadService;
 import com.duowan.download.DownloadFile;
 import com.duowan.download.FileDownloader;
@@ -31,7 +30,7 @@ public class DownloadServiceUtil {
 
 	private static HashMap<Context, ServiceBinder> sConnectionMap = new HashMap<Context, ServiceBinder>();
 
-	protected static ArrayList<BindBeforeComponent> mCallbacks = new ArrayList<BindBeforeComponent>();
+	protected static ArrayList<IProgressListener> mCallbacks = new ArrayList<IProgressListener>();
 
 	protected static ArrayList<IDownloadManagerCallBackListener> mDowningCallbacks = new ArrayList<IDownloadManagerCallBackListener>();
 
@@ -47,15 +46,11 @@ public class DownloadServiceUtil {
 
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			sService = (IDownloadService) service;
+			
 			if (mCallbacks != null && mCallbacks.size() > 0) {
 				for (int i = 0; i < mCallbacks.size(); i++) {
-					BindBeforeComponent component = mCallbacks.remove(i);
-					if (component.getListener() != null
-							&& component.getDownloadManager() != null) {
-						sService.registerCallback(component.getListener(),
-								component.getDownloadManager());
-					} else if (component.getListener() != null) {
-						sService.registerCallback(component.getListener());
+					 if (mCallbacks.get(i) != null) {
+						sService.registerCallback(mCallbacks.get(i));
 					}
 				}
 				mCallbacks = null;
@@ -190,38 +185,19 @@ public class DownloadServiceUtil {
 		} else {
 			synchronized (mCallbacks) {
 				if (!mCallbacks.contains(listener)) {
-					BindBeforeComponent component = new BindBeforeComponent();
-					component.setListener(listener);
-					mCallbacks.add(component);
+					mCallbacks.add(listener);
 				}
 			}
 		}
 	}
 
-	public static void registerCallback(IProgressListener listener,
-			IDownloadManagerCallBackListener callBackListener) {
-		if (checkServiceBinded()) {
-			sService.registerCallback(listener, callBackListener);
-		} else {
-			synchronized (mCallbacks) {
-				if (!mCallbacks.contains(listener)) {
-					BindBeforeComponent component = new BindBeforeComponent();
-					component.setListener(listener);
-					component.setDownloadManager(callBackListener);
-					mCallbacks.add(component);
-				}
-			}
-		}
-	}
 
-	public static void removeCallback(IProgressListener listener) {
+	public static void unRegisterCallback(IProgressListener listener) {
 		if (checkServiceBinded()) {
-			sService.removeCallback(listener);
+			sService.unRegisterCallback(listener);
 		} else {
 			synchronized (mCallbacks) {
-				BindBeforeComponent component = new BindBeforeComponent();
-				component.setListener(listener);
-				mCallbacks.remove(component);
+				mCallbacks.remove(listener);
 			}
 		}
 	}

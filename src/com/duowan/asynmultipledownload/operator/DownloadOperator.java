@@ -9,8 +9,8 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import com.duowan.asynmultipledownload.application.BaseApplication;
 import com.duowan.asynmultipledownload.bean.DownloadTable;
-import com.duowan.asynmultipledownload.ui.BaseApplication;
 import com.duowan.download.DownloadFile;
 import com.duowan.util.LogCat;
 

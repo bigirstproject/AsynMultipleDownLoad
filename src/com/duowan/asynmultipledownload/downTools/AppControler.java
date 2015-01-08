@@ -1,7 +1,7 @@
 package com.duowan.asynmultipledownload.downTools;
 
+import com.duowan.asynmultipledownload.application.AsynMultipleApplication;
 import com.duowan.asynmultipledownload.downTools.DownloadServiceUtil.DownloadServiceToken;
-import com.duowan.asynmultipledownload.ui.AsynMultipleApplication;
 
 /**
  * 描述:应用启动/退出逻辑处理类

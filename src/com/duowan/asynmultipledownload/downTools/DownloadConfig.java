@@ -4,7 +4,7 @@ import java.util.Hashtable;
 
 import android.content.Context;
 
-import com.duowan.asynmultipledownload.ui.BaseApplication;
+import com.duowan.asynmultipledownload.application.BaseApplication;
 import com.duowan.download.DefaultConfig;
 import com.duowan.download.NetType;
 import com.duowan.util.NetWorkUtil;
