@@ -36,6 +36,8 @@
 
         <service
             android:name="com.duowan.asynmultipledownload.service.DownloadService"
+            android:process=":remote"
+            android:exported="true"
             android:icon="@drawable/ic_launcher" >
         </service>
     </application>
